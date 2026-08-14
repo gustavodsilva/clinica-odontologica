@@ -1,0 +1,11 @@
+[phases.build]
+cmds = ["dotnet publish -c Release -o out"]
+
+[phases.start]
+cmd = "dotnet out/ClinicaOdontologica.dll --urls http://0.0.0.0:${PORT}"
+
+[variables]
+PORT = "8080"
+
+[build.env]
+NIXPACKS_BUILD_IMAGE = "mcr.microsoft.com/dotnet/sdk:8.0"
