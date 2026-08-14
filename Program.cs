@@ -16,6 +16,21 @@ var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
 
 Console.WriteLine($"Connection String: {connectionString}");
 
+// Converter connection string do Railway para formato Npgsql
+if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgresql://"))
+{
+    var uri = new Uri(connectionString);
+    var userInfo = uri.UserInfo.Split(':');
+    var username = userInfo[0];
+    var password = userInfo.Length > 1 ? userInfo[1] : "";
+    var host = uri.Host;
+    var port = uri.Port > 0 ? uri.Port : 5432;
+    var database = uri.AbsolutePath.TrimStart('/');
+
+    connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+    Console.WriteLine($"Converted Connection String: {connectionString}");
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
