@@ -25,6 +25,12 @@ public class ConferenceController : Controller
         // Se não informou data, usa ontem
         var targetDate = date ?? DateTime.UtcNow.AddDays(-1).Date;
 
+        // Converter para UTC se necessário
+        if (targetDate.Kind == DateTimeKind.Unspecified)
+        {
+            targetDate = DateTime.SpecifyKind(targetDate, DateTimeKind.Utc);
+        }
+
         IQueryable<Payment> query = _context.Payments
             .Include(p => p.Unit)
             .Include(p => p.PaymentMethod)

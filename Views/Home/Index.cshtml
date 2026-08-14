@@ -1,8 +1,143 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model ClinicaOdontologica.Models.HomeViewModel
+
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <img src="~/images/logo.png" alt="RIS.O.S Logo" class="img-fluid" style="max-height: 150px;" onerror="this.style.display='none';" />
+        <h1 class="display-4 mt-3">Sistema de Conciliação Financeira</h1>
+        <p class="lead">Clínica Odontológica</p>
+    </div>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="row">
+            <!-- Resumo Diário -->
+            <div class="col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Resumo do Dia (@Model.TodayDate.ToString("dd/MM/yyyy"))</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6>Total de Pagamentos</h6>
+                                        <h3 class="text-primary">@Model.TotalPayments</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6>Pendentes</h6>
+                                        <h3 class="text-warning">@Model.PendingPayments</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6>Conferidos (OK)</h6>
+                                        <h3 class="text-success">@Model.ConfirmedPayments</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6>Total Bruto</h6>
+                                        <h3 class="text-info">@Model.TotalGrossAmount.ToString("C2")</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Links Rápidos -->
+            <div class="col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Acesso Rápido</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <a asp-controller="Payments" asp-action="Create" class="btn btn-outline-primary btn-block w-100">
+                                    <i class="bi bi-plus-circle"></i> Novo Pagamento
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a asp-controller="Payments" asp-action="Index" class="btn btn-outline-primary btn-block w-100">
+                                    <i class="bi bi-list"></i> Meus Lançamentos
+                                </a>
+                            </div>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="col-md-3 mb-3">
+                                    <a asp-controller="Conference" asp-action="Index" class="btn btn-outline-success btn-block w-100">
+                                        <i class="bi bi-check-circle"></i> Conferência
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <a asp-controller="PaymentLogs" asp-action="Index" class="btn btn-outline-info btn-block w-100">
+                                        <i class="bi bi-clock-history"></i> Logs
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Por Unidade (Admin only) -->
+            @if (User.IsInRole("Admin") && Model.PaymentsByUnit.Any())
+            {
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Resumo por Unidade</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Unidade</th>
+                                        <th>Total Pagamentos</th>
+                                        <th>Pendentes</th>
+                                        <th>Conferidos</th>
+                                        <th>Total Bruto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.PaymentsByUnit)
+                                    {
+                                        <tr>
+                                            <td>@item.UnitName</td>
+                                            <td>@item.Total</td>
+                                            <td>@item.Pending</td>
+                                            <td>@item.Confirmed</td>
+                                            <td>@item.GrossAmount.ToString("C2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center mt-5">
+            <p class="lead">Faça login para acessar o sistema.</p>
+            <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg">Login</a>
+        </div>
+    }
 </div>
