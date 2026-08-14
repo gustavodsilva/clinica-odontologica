@@ -15,6 +15,7 @@ RUN dotnet publish "ClinicaOdontologica.csproj" -c Release -o /app/publish --no-
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
-ENV ASPNETCORE_URLS=http://+:8080
-EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:${PORT}
+ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
+EXPOSE ${PORT}
 ENTRYPOINT ["dotnet", "ClinicaOdontologica.dll"]
