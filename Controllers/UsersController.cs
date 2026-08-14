@@ -215,4 +215,72 @@ public class UsersController : Controller
         ViewBag.Units = _context.Units.Where(u => u.Active).ToList();
         return View();
     }
+
+    // GET: Users/Delete/5
+    public async Task<IActionResult> Delete(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return NotFound();
+        }
+
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        var role = roles.FirstOrDefault() ?? "Sem role";
+
+        var model = new DeleteUserViewModel
+        {
+            Id = user.Id,
+            Email = user.Email,
+            Role = role,
+            Unit = user.Unit?.Name ?? "Todas"
+        };
+
+        return View(model);
+    }
+
+    // POST: Users/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return NotFound();
+        }
+
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
+        {
+            TempData["ErrorMessage"] = "Usuário não encontrado.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Verificar se o usuário logado está tentando se excluir
+        var currentUserId = _userManager.GetUserId(User);
+        if (user.Id == currentUserId)
+        {
+            TempData["ErrorMessage"] = "Você não pode excluir seu próprio usuário.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var result = await _userManager.DeleteAsync(user);
+        if (result.Succeeded)
+        {
+            TempData["SuccessMessage"] = "Usuário excluído com sucesso!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError("", error.Description);
+        }
+
+        return View(user);
+    }
 }

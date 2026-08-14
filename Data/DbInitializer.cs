@@ -22,6 +22,85 @@ public static class DbInitializer
             await roleManager.CreateAsync(new IdentityRole("Recepcao"));
         }
 
+        // Seed de unidades se não existirem
+        await SeedUnits(context);
+
+        // Seed de formas de pagamento se não existirem
+        await SeedPaymentMethods(context);
+
+        // Seed de bandeiras se não existirem
+        await SeedCardBrands(context);
+
+        // Seed de usuários se não existirem
+        await SeedUsers(context, userManager, roleManager);
+
+        // Seed de regras de taxa se não existirem
+        await SeedFeeRules(context);
+    }
+
+    private static async Task SeedUnits(ApplicationDbContext context)
+    {
+        if (await context.Units.AnyAsync())
+        {
+            return; // Já foram criadas, não recriar
+        }
+
+        var units = new List<Unit>
+        {
+            new Unit { Name = "Palmeiras - Suzano", Active = true },
+            new Unit { Name = "Ferraz de Vasconcelos", Active = true }
+        };
+
+        await context.Units.AddRangeAsync(units);
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedPaymentMethods(ApplicationDbContext context)
+    {
+        if (await context.PaymentMethods.AnyAsync())
+        {
+            return; // Já foram criadas, não recriar
+        }
+
+        var paymentMethods = new List<PaymentMethod>
+        {
+            new PaymentMethod { Name = "Dinheiro", Active = true, RequiresBrand = false, RequiresInstallments = false },
+            new PaymentMethod { Name = "Pix", Active = true, RequiresBrand = false, RequiresInstallments = false },
+            new PaymentMethod { Name = "Boleto", Active = true, RequiresBrand = false, RequiresInstallments = false },
+            new PaymentMethod { Name = "Cartão de Débito", Active = true, RequiresBrand = true, RequiresInstallments = false },
+            new PaymentMethod { Name = "Cartão de Crédito", Active = true, RequiresBrand = true, RequiresInstallments = true }
+        };
+
+        await context.PaymentMethods.AddRangeAsync(paymentMethods);
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedCardBrands(ApplicationDbContext context)
+    {
+        if (await context.CardBrands.AnyAsync())
+        {
+            return; // Já foram criadas, não recriar
+        }
+
+        var cardBrands = new List<CardBrand>
+        {
+            new CardBrand { Name = "Mastercard", Active = true },
+            new CardBrand { Name = "Visa", Active = true },
+            new CardBrand { Name = "Elo", Active = true },
+            new CardBrand { Name = "Amex", Active = true },
+            new CardBrand { Name = "Outras Bandeiras", Active = true }
+        };
+
+        await context.CardBrands.AddRangeAsync(cardBrands);
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedUsers(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+    {
+        // Buscar unidades
+        var palmeirasUnit = await context.Units.FirstOrDefaultAsync(u => u.Name == "Palmeiras - Suzano");
+        var ferrazUnit = await context.Units.FirstOrDefaultAsync(u => u.Name == "Ferraz de Vasconcelos");
+
         // Criar usuário Admin se não existir
         var adminUser = await userManager.FindByEmailAsync("admin@clinica.com");
         if (adminUser == null)
@@ -40,8 +119,77 @@ public static class DbInitializer
             }
         }
 
-        // Seed de regras de taxa se não existirem
-        await SeedFeeRules(context);
+        // Criar usuário admin@clinicarisos.com.br se não existir
+        var adminRisosUser = await userManager.FindByEmailAsync("admin@clinicarisos.com.br");
+        if (adminRisosUser == null)
+        {
+            adminRisosUser = new ApplicationUser
+            {
+                UserName = "admin@clinicarisos.com.br",
+                Email = "admin@clinicarisos.com.br",
+                UnitId = null
+            };
+
+            var result = await userManager.CreateAsync(adminRisosUser, "Admin@123");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(adminRisosUser, "Admin");
+            }
+        }
+
+        // Criar usuário debora se não existir
+        var deboraUser = await userManager.FindByEmailAsync("debora@clinicarisos.com.br");
+        if (deboraUser == null && palmeirasUnit != null)
+        {
+            deboraUser = new ApplicationUser
+            {
+                UserName = "debora@clinicarisos.com.br",
+                Email = "debora@clinicarisos.com.br",
+                UnitId = palmeirasUnit.Id
+            };
+
+            var result = await userManager.CreateAsync(deboraUser, "Recepcao@123");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(deboraUser, "Recepcao");
+            }
+        }
+
+        // Criar usuário beatriz se não existir
+        var beatrizUser = await userManager.FindByEmailAsync("beatriz@clinicarisos.com.br");
+        if (beatrizUser == null && ferrazUnit != null)
+        {
+            beatrizUser = new ApplicationUser
+            {
+                UserName = "beatriz@clinicarisos.com.br",
+                Email = "beatriz@clinicarisos.com.br",
+                UnitId = ferrazUnit.Id
+            };
+
+            var result = await userManager.CreateAsync(beatrizUser, "Recepcao@123");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(beatrizUser, "Recepcao");
+            }
+        }
+
+        // Criar usuário richard se não existir
+        var richardUser = await userManager.FindByEmailAsync("richard@clinicarisos.com.br");
+        if (richardUser == null && ferrazUnit != null)
+        {
+            richardUser = new ApplicationUser
+            {
+                UserName = "richard@clinicarisos.com.br",
+                Email = "richard@clinicarisos.com.br",
+                UnitId = ferrazUnit.Id
+            };
+
+            var result = await userManager.CreateAsync(richardUser, "Recepcao@123");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(richardUser, "Recepcao");
+            }
+        }
     }
 
     private static async Task SeedFeeRules(ApplicationDbContext context)

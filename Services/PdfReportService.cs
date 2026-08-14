@@ -1,6 +1,7 @@
 using ClinicaOdontologica.Data;
 using ClinicaOdontologica.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Text;
 
 namespace ClinicaOdontologica.Services;
@@ -12,6 +13,24 @@ public class PdfReportService : IPdfReportService
     public PdfReportService(ApplicationDbContext context)
     {
         _context = context;
+    }
+
+    // Helper method para remover acentos
+    private string RemoveAccents(string text)
+    {
+        var normalizedString = text.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
 
     public byte[] GenerateDailyReport(DateTime date, int? unitId = null)
@@ -52,7 +71,7 @@ public class PdfReportService : IPdfReportService
 
         // Separar cartões (crédito e débito)
         var cardPayments = payments.Where(p => p.PaymentMethod != null && 
-            p.PaymentMethod.Name.ToLower().Contains("cart")).ToList();
+            RemoveAccents(p.PaymentMethod.Name.ToLower()).Contains("cartao")).ToList();
 
         if (cardPayments.Any())
         {
@@ -60,9 +79,9 @@ public class PdfReportService : IPdfReportService
             sb.AppendLine("----------------------------------------");
             
             var creditCardPayments = cardPayments.Where(p => p.PaymentMethod != null && 
-                p.PaymentMethod.Name.ToLower().Contains("crédito") || p.PaymentMethod.Name.ToLower().Contains("credito")).ToList();
+                RemoveAccents(p.PaymentMethod.Name.ToLower()).Contains("credito")).ToList();
             var debitCardPayments = cardPayments.Where(p => p.PaymentMethod != null && 
-                p.PaymentMethod.Name.ToLower().Contains("débito") || p.PaymentMethod.Name.ToLower().Contains("debito")).ToList();
+                RemoveAccents(p.PaymentMethod.Name.ToLower()).Contains("debito")).ToList();
 
             if (creditCardPayments.Any())
             {

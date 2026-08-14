@@ -4,8 +4,8 @@ using ClinicaOdontologica.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-namespace ClinicaOdontologica.Controllers;
+using System.Globalization;
+using System.Text;
 
 [Authorize]
 public class PaymentsController : Controller
@@ -25,6 +25,24 @@ public class PaymentsController : Controller
         _currentUserService = currentUserService;
         _feeCalculationService = feeCalculationService;
         _businessDayService = businessDayService;
+    }
+
+    // Helper method para remover acentos
+    private string RemoveAccents(string text)
+    {
+        var normalizedString = text.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
 
     // GET: Payments
@@ -131,9 +149,14 @@ public class PaymentsController : Controller
         }
 
         // Calcular data de recebimento para pagamentos com cartão
-        if (paymentMethod != null && paymentMethod.Name.ToLower().Contains("cart"))
+        if (paymentMethod != null)
         {
-            payment.ExpectedReceiptDate = _businessDayService.GetNextBusinessDay(payment.PaymentDate);
+            var normalizedName = RemoveAccents(paymentMethod.Name.ToLower());
+            
+            if (normalizedName.Contains("cartao"))
+            {
+                payment.ExpectedReceiptDate = _businessDayService.GetNextBusinessDay(payment.PaymentDate);
+            }
         }
 
         // Definir unit_id do usuário logado (nunca do formulário)
@@ -304,7 +327,7 @@ public class PaymentsController : Controller
         }
 
         // Recalcular data de recebimento para pagamentos com cartão
-        if (paymentMethod != null && paymentMethod.Name.ToLower().Contains("cart"))
+        if (paymentMethod != null && RemoveAccents(paymentMethod.Name.ToLower()).Contains("cartao"))
         {
             existingPayment.ExpectedReceiptDate = _businessDayService.GetNextBusinessDay(existingPayment.PaymentDate);
         }
