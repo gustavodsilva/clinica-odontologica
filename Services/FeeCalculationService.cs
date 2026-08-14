@@ -26,11 +26,10 @@ public class FeeCalculationService : IFeeCalculationService
                 && f.Installments == installments
                 && f.Active);
 
+        // Se não houver regra de taxa, assumir 0% (para dinheiro, boleto, pix, etc.)
         if (feeRule == null)
         {
-            throw new InvalidOperationException(
-                "Não foi encontrada uma regra de taxa ativa para esta combinação de forma de pagamento, bandeira e parcelas. " +
-                "Entre em contato com o Admin para cadastrar a taxa antes de lançar o pagamento.");
+            return (0m, 0m, grossAmount);
         }
 
         // Calcular: fee_amount = gross_amount * (fee_percentage / 100)

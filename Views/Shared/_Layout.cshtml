@@ -60,8 +60,10 @@
                                 <span class="nav-link text-dark">@User.Identity.Name</span>
                             </li>
                             <li class="nav-item">
-                                <form class="form-inline" asp-action="Logout" asp-controller="Account" method="post">
-                                    <button type="submit" class="btn btn-link nav-link text-dark">Sair</button>
+                                <form class="d-flex gap-2" asp-controller="Account" asp-action="Logout" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <a asp-controller="Account" asp-action="ChangePassword" class="btn btn-outline-light">Alterar Senha</a>
+                                    <button type="submit" class="btn btn-outline-light">Logout</button>
                                 </form>
                             </li>
                         }

@@ -36,10 +36,11 @@
                     @ViewBag.UserRoles[item.Id]
                 </td>
                 <td>
-                    @(item.Unit != null ? item.Unit.Name : "Todas")
+                    @(item.Unit?.Name ?? "Todas")
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Editar</a>
+                    <a asp-controller="Account" asp-action="ResetPassword" asp-route-userId="@item.Id" class="btn btn-sm btn-warning">Resetar Senha</a>
                 </td>
             </tr>
         }
