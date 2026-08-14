@@ -61,9 +61,19 @@ public class PaymentsController : Controller
         var currentUserId = _currentUserService.GetCurrentUserId();
 
         // Validações
+        if (string.IsNullOrWhiteSpace(payment.PatientCode))
+        {
+            ModelState.AddModelError("PatientCode", "Código do paciente é obrigatório.");
+        }
+
         if (payment.GrossAmount <= 0)
         {
             ModelState.AddModelError("GrossAmount", "Valor deve ser maior que zero.");
+        }
+
+        if (payment.PaymentDate > DateTime.UtcNow.Date.AddDays(1))
+        {
+            ModelState.AddModelError("PaymentDate", "Data de pagamento não pode ser futura.");
         }
 
         var paymentMethod = await _context.PaymentMethods.FindAsync(payment.PaymentMethodId);
@@ -154,6 +164,7 @@ public class PaymentsController : Controller
         _context.PaymentLogs.Add(log);
         await _context.SaveChangesAsync();
 
+        TempData["SuccessMessage"] = "Pagamento lançado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
 
@@ -211,9 +222,19 @@ public class PaymentsController : Controller
         }
 
         // Validações
+        if (string.IsNullOrWhiteSpace(payment.PatientCode))
+        {
+            ModelState.AddModelError("PatientCode", "Código do paciente é obrigatório.");
+        }
+
         if (payment.GrossAmount <= 0)
         {
             ModelState.AddModelError("GrossAmount", "Valor deve ser maior que zero.");
+        }
+
+        if (payment.PaymentDate > DateTime.UtcNow.Date.AddDays(1))
+        {
+            ModelState.AddModelError("PaymentDate", "Data de pagamento não pode ser futura.");
         }
 
         var paymentMethod = await _context.PaymentMethods.FindAsync(payment.PaymentMethodId);
@@ -294,6 +315,7 @@ public class PaymentsController : Controller
         _context.PaymentLogs.Add(log);
         await _context.SaveChangesAsync();
 
+        TempData["SuccessMessage"] = "Pagamento atualizado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
 }
