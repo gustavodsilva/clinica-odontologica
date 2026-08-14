@@ -3,7 +3,6 @@ using ClinicaOdontologica.Data;
 using ClinicaOdontologica.Models;
 using ClinicaOdontologica.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,15 +12,11 @@ public class HomeController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly ICurrentUserService _currentUserService;
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
 
-    public HomeController(ApplicationDbContext context, ICurrentUserService currentUserService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+    public HomeController(ApplicationDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
         _currentUserService = currentUserService;
-        _userManager = userManager;
-        _roleManager = roleManager;
     }
 
     public async Task<IActionResult> Index()
@@ -86,19 +81,5 @@ public class HomeController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
-
-    // Temporary endpoint to initialize database (remove after first use in production)
-    public async Task<IActionResult> SeedDatabase()
-    {
-        try
-        {
-            await DbInitializer.Initialize(_context, _userManager, _roleManager);
-            return Content("Database seeded successfully! Please remove this endpoint after first use.");
-        }
-        catch (Exception ex)
-        {
-            return Content($"Error seeding database: {ex.Message}");
-        }
     }
 }
