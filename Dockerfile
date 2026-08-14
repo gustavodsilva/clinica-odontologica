@@ -9,11 +9,12 @@ RUN dotnet restore "ClinicaOdontologica.csproj"
 # Copy all files and build
 COPY . .
 WORKDIR "/src"
-RUN dotnet publish "ClinicaOdontologica.csproj" -c Release -o /app/publish
+RUN dotnet publish "ClinicaOdontologica.csproj" -c Release -o /app/publish --no-restore
 
 # Use .NET 6.0 runtime for running
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
+ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "ClinicaOdontologica.dll"]
