@@ -74,6 +74,9 @@
                 Valor Líquido
             </th>
             <th>
+                Data Recebimento
+            </th>
+            <th>
                 Status
             </th>
             <th>Ações</th>
@@ -107,9 +110,25 @@
                     @item.NetAmountExpected.ToString("C2")
                 </td>
                 <td>
-                    <span class="badge @(item.Status == PaymentStatus.OK ? "bg-success" : "bg-warning")">
-                        @item.Status.ToString()
-                    </span>
+                    @if (item.ExpectedReceiptDate.HasValue)
+                    {
+                        @item.ExpectedReceiptDate.Value.ToString("dd/MM/yyyy")
+                    }
+                    else
+                    {
+                        @:-
+                    }
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        @if (item.Status == PaymentStatus.Pendente && item.ExpectedReceiptDate.HasValue && item.ExpectedReceiptDate.Value.Date < DateTime.UtcNow.Date)
+                        {
+                            <span class="badge bg-danger me-2" style="width: 10px; height: 10px; border-radius: 50%; padding: 0;"></span>
+                        }
+                        <span class="badge @(item.Status == PaymentStatus.OK ? "bg-success" : "bg-warning")">
+                            @item.Status.ToString()
+                        </span>
+                    </div>
                 </td>
                 <td>
                     @if (item.Status == PaymentStatus.Pendente)
