@@ -46,6 +46,10 @@ builder.Services.AddScoped<IBusinessDayService, BusinessDayService>();
 
 var app = builder.Build();
 
+// Configure Kestrel to use PORT from environment
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Urls.Add($"http://0.0.0.0:{port}");
+
 // Initialize database and seed data (only in development)
 using (var scope = app.Services.CreateScope())
 {
