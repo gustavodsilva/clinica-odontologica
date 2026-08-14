@@ -1,0 +1,60 @@
+@model IEnumerable<ClinicaOdontologica.Models.PaymentLog>
+
+@{
+    ViewData["Title"] = "Logs de Pagamentos";
+}
+
+<h2>Logs de Pagamentos</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Data/Hora
+            </th>
+            <th>
+                Ação
+            </th>
+            <th>
+                Usuário
+            </th>
+            <th>
+                Pagamento ID
+            </th>
+            <th>
+                Valor Anterior
+            </th>
+            <th>
+                Valor Novo
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.ChangedAt.ToString("dd/MM/yyyy HH:mm:ss")
+                </td>
+                <td>
+                    @item.Action
+                </td>
+                <td>
+                    @item.ChangedBy
+                </td>
+                <td>
+                    @item.PaymentId
+                    @(item.Payment != null ? $" ({item.Payment.PatientCode})" : "")
+                </td>
+                <td>
+                    @item.OldValue
+                </td>
+                <td>
+                    @item.NewValue
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="Conference" asp-action="Index" class="btn btn-secondary">Voltar para Conferência</a>

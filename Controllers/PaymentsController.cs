@@ -134,7 +134,24 @@ public class PaymentsController : Controller
         payment.CreatedBy = currentUserId;
         payment.CreatedAt = DateTime.UtcNow;
 
+        // Converter PaymentDate para UTC
+        if (payment.PaymentDate.Kind == DateTimeKind.Unspecified)
+        {
+            payment.PaymentDate = DateTime.SpecifyKind(payment.PaymentDate, DateTimeKind.Utc);
+        }
+
         _context.Add(payment);
+        await _context.SaveChangesAsync();
+
+        // Criar log de criação
+        var log = new PaymentLog
+        {
+            PaymentId = payment.Id,
+            Action = "Created",
+            ChangedBy = currentUserId,
+            ChangedAt = DateTime.UtcNow
+        };
+        _context.PaymentLogs.Add(log);
         await _context.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));
@@ -183,6 +200,8 @@ public class PaymentsController : Controller
         {
             return NotFound();
         }
+
+        var currentUserId = _currentUserService.GetCurrentUserId();
 
         // Só permite edição se status = Pendente ou se for Admin
         var isAdmin = _currentUserService.IsAdmin();
@@ -256,6 +275,23 @@ public class PaymentsController : Controller
         existingPayment.CardBrandId = payment.CardBrandId;
         existingPayment.Installments = payment.Installments;
 
+        // Converter PaymentDate para UTC se necessário
+        if (existingPayment.PaymentDate.Kind == DateTimeKind.Unspecified)
+        {
+            existingPayment.PaymentDate = DateTime.SpecifyKind(existingPayment.PaymentDate, DateTimeKind.Utc);
+        }
+
+        await _context.SaveChangesAsync();
+
+        // Criar log de edição
+        var log = new PaymentLog
+        {
+            PaymentId = existingPayment.Id,
+            Action = "Edited",
+            ChangedBy = currentUserId,
+            ChangedAt = DateTime.UtcNow
+        };
+        _context.PaymentLogs.Add(log);
         await _context.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));

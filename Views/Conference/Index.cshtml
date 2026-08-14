@@ -1,0 +1,121 @@
+@model IEnumerable<ClinicaOdontologica.Models.Payment>
+
+@{
+    ViewData["Title"] = "Conferência";
+}
+
+<h2>Conferência de Pagamentos</h2>
+
+<form method="get" class="mb-3">
+    <div class="row">
+        <div class="col-md-3">
+            <label for="date" class="form-label">Data</label>
+            <input type="date" id="date" name="date" class="form-control" value="@ViewBag.TargetDate.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-3">
+            <label for="unitId" class="form-label">Unidade</label>
+            <select id="unitId" name="unitId" class="form-select">
+                <option value="">Todas</option>
+                @foreach (var unit in ViewBag.Units)
+                {
+                    <option value="@unit.Id" selected="@(ViewBag.SelectedUnitId == unit.Id ? "selected" : null)">@unit.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="status" class="form-label">Status</label>
+            <select id="status" name="status" class="form-select">
+                <option value="">Todos</option>
+                <option value="0" selected="@(ViewBag.SelectedStatus == ClinicaOdontologica.Models.PaymentStatus.Pendente ? "selected" : null)">Pendente</option>
+                <option value="1" selected="@(ViewBag.SelectedStatus == ClinicaOdontologica.Models.PaymentStatus.OK ? "selected" : null)">OK</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Código Paciente
+            </th>
+            <th>
+                Unidade
+            </th>
+            <th>
+                Data Pagamento
+            </th>
+            <th>
+                Valor Bruto
+            </th>
+            <th>
+                Forma Pagamento
+            </th>
+            <th>
+                Taxa Aplicada
+            </th>
+            <th>
+                Valor Líquido
+            </th>
+            <th>
+                Status
+            </th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PatientCode)
+                </td>
+                <td>
+                    @(item.Unit?.Name ?? "-")
+                </td>
+                <td>
+                    @item.PaymentDate.ToString("dd/MM/yyyy")
+                </td>
+                <td>
+                    @item.GrossAmount.ToString("C2")
+                </td>
+                <td>
+                    @(item.PaymentMethod?.Name ?? "-")
+                    @(item.CardBrand != null ? $" + {item.CardBrand.Name}" : "")
+                    @(item.Installments.HasValue ? $" ({item.Installments}x)" : "")
+                </td>
+                <td>
+                    @item.FeePercentageApplied.ToString("F2")% (@item.FeeAmount.ToString("C2"))
+                </td>
+                <td>
+                    @item.NetAmountExpected.ToString("C2")
+                </td>
+                <td>
+                    <span class="badge @(item.Status == PaymentStatus.OK ? "bg-success" : "bg-warning")">
+                        @item.Status.ToString()
+                    </span>
+                </td>
+                <td>
+                    @if (item.Status == PaymentStatus.Pendente)
+                    {
+                        <form asp-action="Confirm" asp-route-id="@item.Id" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-success">Marcar OK</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-action="Unconfirm" asp-route-id="@item.Id" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-warning">Marcar Pendente</button>
+                        </form>
+                    }
+                    <a asp-controller="PaymentLogs" asp-action="Index" asp-route-paymentId="@item.Id" class="btn btn-sm btn-info">Logs</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

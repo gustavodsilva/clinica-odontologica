@@ -31,6 +31,12 @@
                             @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Conference" asp-action="Index">Conferência</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="PaymentLogs" asp-action="Index">Logs</a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Units" asp-action="Index">Unidades</a>
                                 </li>
                                 <li class="nav-item">
