@@ -25,6 +25,9 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Payments" asp-action="Index">Pagamentos</a>
+                            </li>
                             @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
@@ -32,6 +35,14 @@
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Usuários</a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">Taxas</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="PaymentMethods" asp-action="Index">Formas de Pagamento</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="CardBrands" asp-action="Index">Bandeiras</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="FeeRules" asp-action="Index">Regras de Taxa</a></li>
+                                    </ul>
                                 </li>
                             }
                         }

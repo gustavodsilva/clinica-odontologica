@@ -1,0 +1,60 @@
+@model IEnumerable<ClinicaOdontologica.Models.FeeRule>
+
+@{
+    ViewData["Title"] = "Regras de Taxa";
+}
+
+<h2>Regras de Taxa</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nova Regra</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Forma de Pagamento
+            </th>
+            <th>
+                Bandeira
+            </th>
+            <th>
+                Parcelas
+            </th>
+            <th>
+                Taxa (%)
+            </th>
+            <th>
+                Ativa
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @(item.PaymentMethod?.Name ?? "-")
+                </td>
+                <td>
+                    @(item.CardBrand?.Name ?? "-")
+                </td>
+                <td>
+                    @(item.Installments?.ToString() ?? "-")
+                </td>
+                <td>
+                    @item.FeePercentage.ToString("F2")%
+                </td>
+                <td>
+                    @(item.Active ? "Sim" : "Não")
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Excluir</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

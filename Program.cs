@@ -29,6 +29,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddHttpContextAccessor();
 
+// Register FeeCalculationService
+builder.Services.AddScoped<IFeeCalculationService, FeeCalculationService>();
+
 var app = builder.Build();
 
 // Initialize database and seed data

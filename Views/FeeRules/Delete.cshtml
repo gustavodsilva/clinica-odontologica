@@ -1,0 +1,50 @@
+@model ClinicaOdontologica.Models.FeeRule
+
+@{
+    ViewData["Title"] = "Excluir Regra de Taxa";
+}
+
+<h2>Excluir Regra de Taxa</h2>
+
+<h3>Tem certeza que deseja excluir esta regra?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Forma de Pagamento
+        </dt>
+        <dd class="col-sm-10">
+            @(Model.PaymentMethod?.Name ?? "-")
+        </dd>
+        <dt class="col-sm-2">
+            Bandeira
+        </dt>
+        <dd class="col-sm-10">
+            @(Model.CardBrand?.Name ?? "-")
+        </dd>
+        <dt class="col-sm-2">
+            Parcelas
+        </dt>
+        <dd class="col-sm-10">
+            @(Model.Installments?.ToString() ?? "-")
+        </dd>
+        <dt class="col-sm-2">
+            Taxa (%)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.FeePercentage.ToString("F2")%
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Active)
+        </dt>
+        <dd class="col-sm-10">
+            @(Model.Active ? "Sim" : "Não")
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Excluir" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

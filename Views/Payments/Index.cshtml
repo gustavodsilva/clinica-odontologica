@@ -1,0 +1,78 @@
+@model IEnumerable<ClinicaOdontologica.Models.Payment>
+
+@{
+    ViewData["Title"] = "Meus Lançamentos";
+}
+
+<h2>Meus Lançamentos</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Novo Pagamento</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Código Paciente
+            </th>
+            <th>
+                Data Pagamento
+            </th>
+            <th>
+                Valor Bruto
+            </th>
+            <th>
+                Forma Pagamento
+            </th>
+            <th>
+                Taxa Aplicada
+            </th>
+            <th>
+                Valor Líquido
+            </th>
+            <th>
+                Status
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PatientCode)
+                </td>
+                <td>
+                    @item.PaymentDate.ToString("dd/MM/yyyy")
+                </td>
+                <td>
+                    @item.GrossAmount.ToString("C2")
+                </td>
+                <td>
+                    @(item.PaymentMethod?.Name ?? "-")
+                    @(item.CardBrand != null ? $" + {item.CardBrand.Name}" : "")
+                    @(item.Installments.HasValue ? $" ({item.Installments}x)" : "")
+                </td>
+                <td>
+                    @item.FeePercentageApplied.ToString("F2")% (@item.FeeAmount.ToString("C2"))
+                </td>
+                <td>
+                    @item.NetAmountExpected.ToString("C2")
+                </td>
+                <td>
+                    <span class="badge @(item.Status == PaymentStatus.OK ? "bg-success" : "bg-warning")">
+                        @item.Status.ToString()
+                    </span>
+                </td>
+                <td>
+                    @if (item.Status == PaymentStatus.Pendente)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

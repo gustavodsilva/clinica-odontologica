@@ -1,0 +1,61 @@
+@model ClinicaOdontologica.Models.UserEditViewModel
+
+@{
+    ViewData["Title"] = "Editar Usuário";
+}
+
+<h2>Editar Usuário</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            <div class="text-danger" asp-validation-summary="All"></div>
+            <input type="hidden" asp-for="Id" />
+            
+            <div class="form-group mb-3">
+                <label for="email" class="control-label">Email</label>
+                <input type="email" id="email" name="email" class="form-control" value="@Model.Email" required />
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="role" class="control-label">Role</label>
+                <select id="role" name="role" class="form-control" required onchange="toggleUnitField()">
+                    <option value="">Selecione...</option>
+                    <option value="Admin" selected="@(Model.Role == "Admin" ? "selected" : null)">Admin</option>
+                    <option value="Recepcao" selected="@(Model.Role == "Recepcao" ? "selected" : null)">Recepcao</option>
+                </select>
+            </div>
+            
+            <div class="form-group mb-3" id="unitField" style="display: @(Model.Role == "Recepcao" ? "block" : "none");">
+                <label for="unitId" class="control-label">Unidade</label>
+                <select id="unitId" name="unitId" class="form-control">
+                    <option value="">Selecione...</option>
+                    @foreach (var unit in ViewBag.Units)
+                    {
+                        <option value="@unit.Id" selected="@(Model.UnitId == unit.Id ? "selected" : null)">@unit.Name</option>
+                    }
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Salvar" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleUnitField() {
+            var role = document.getElementById('role').value;
+            var unitField = document.getElementById('unitField');
+            if (role === 'Recepcao') {
+                unitField.style.display = 'block';
+            } else {
+                unitField.style.display = 'none';
+            }
+        }
+    </script>
+}

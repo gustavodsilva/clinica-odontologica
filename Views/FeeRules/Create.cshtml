@@ -1,0 +1,87 @@
+@model ClinicaOdontologica.Models.FeeRule
+
+@{
+    ViewData["Title"] = "Nova Regra de Taxa";
+}
+
+<h2>Nova Regra de Taxa</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label for="paymentMethodId" class="control-label">Forma de Pagamento</label>
+                <select id="paymentMethodId" name="paymentMethodId" class="form-control" required onchange="toggleCardBrandField()">
+                    <option value="">Selecione...</option>
+                    @foreach (var pm in ViewBag.PaymentMethods)
+                    {
+                        <option value="@pm.Id">@pm.Name</option>
+                    }
+                </select>
+            </div>
+            
+            <div class="form-group mb-3" id="cardBrandField" style="display: none;">
+                <label for="cardBrandId" class="control-label">Bandeira</label>
+                <select id="cardBrandId" name="cardBrandId" class="form-control">
+                    <option value="">Selecione...</option>
+                    @foreach (var cb in ViewBag.CardBrands)
+                    {
+                        <option value="@cb.Id">@cb.Name</option>
+                    }
+                </select>
+            </div>
+            
+            <div class="form-group mb-3" id="installmentsField" style="display: none;">
+                <label for="installments" class="control-label">Número de Parcelas</label>
+                <input type="number" id="installments" name="installments" class="form-control" min="1" />
+                <small class="text-muted">Deixe em branco para taxa única (sem parcelamento)</small>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="FeePercentage" class="control-label">Taxa (%)</label>
+                <input asp-for="FeePercentage" class="form-control" type="number" step="0.01" min="0" required />
+                <span asp-validation-for="FeePercentage" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <div class="form-check">
+                    <input asp-for="Active" class="form-check-input" type="checkbox" checked />
+                    <label asp-for="Active" class="form-check-label"></label>
+                </div>
+                <span asp-validation-for="Active" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Salvar" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleCardBrandField() {
+            var paymentMethodId = document.getElementById('paymentMethodId').value;
+            var cardBrandField = document.getElementById('cardBrandField');
+            var installmentsField = document.getElementById('installmentsField');
+            
+            // Verifica se a forma de pagamento selecionada requer bandeira
+            // Isso seria melhor feito com AJAX, mas por simplicidade vamos assumir
+            // que cartões de crédito/débito requerem bandeira
+            var requiresBrand = paymentMethodId !== ""; // Simplificação - na prática deveria verificar no backend
+            
+            if (requiresBrand) {
+                cardBrandField.style.display = 'block';
+                installmentsField.style.display = 'block';
+            } else {
+                cardBrandField.style.display = 'none';
+                installmentsField.style.display = 'none';
+            }
+        }
+    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,91 @@
+@model ClinicaOdontologica.Models.Payment
+
+@{
+    ViewData["Title"] = "Novo Pagamento";
+}
+
+<h2>Novo Pagamento</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="PatientCode" class="control-label"></label>
+                <input asp-for="PatientCode" class="form-control" required />
+                <span asp-validation-for="PatientCode" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="PaymentDate" class="control-label"></label>
+                <input asp-for="PaymentDate" class="form-control" type="date" required />
+                <span asp-validation-for="PaymentDate" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="GrossAmount" class="control-label">Valor Bruto (R$)</label>
+                <input asp-for="GrossAmount" class="form-control" type="number" step="0.01" min="0.01" required />
+                <span asp-validation-for="GrossAmount" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="paymentMethodId" class="control-label">Forma de Pagamento</label>
+                <select id="paymentMethodId" name="paymentMethodId" class="form-control" required onchange="toggleCardBrandAndInstallments()">
+                    <option value="">Selecione...</option>
+                    @foreach (var pm in ViewBag.PaymentMethods)
+                    {
+                        <option value="@pm.Id" data-requires-brand="@pm.RequiresBrand.ToString().ToLower()" data-requires-installments="@pm.RequiresInstallments.ToString().ToLower()">
+                            @pm.Name
+                        </option>
+                    }
+                </select>
+            </div>
+            
+            <div class="form-group mb-3" id="cardBrandField" style="display: none;">
+                <label for="cardBrandId" class="control-label">Bandeira</label>
+                <select id="cardBrandId" name="cardBrandId" class="form-control">
+                    <option value="">Selecione...</option>
+                    @foreach (var cb in ViewBag.CardBrands)
+                    {
+                        <option value="@cb.Id">@cb.Name</option>
+                    }
+                </select>
+            </div>
+            
+            <div class="form-group mb-3" id="installmentsField" style="display: none;">
+                <label for="installments" class="control-label">Número de Parcelas</label>
+                <input type="number" id="installments" name="installments" class="form-control" min="1" max="12" />
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Calcular e Salvar" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleCardBrandAndInstallments() {
+            var select = document.getElementById('paymentMethodId');
+            var selectedOption = select.options[select.selectedIndex];
+            var requiresBrand = selectedOption.getAttribute('data-requires-brand') === 'true';
+            var requiresInstallments = selectedOption.getAttribute('data-requires-installments') === 'true';
+            
+            document.getElementById('cardBrandField').style.display = requiresBrand ? 'block' : 'none';
+            document.getElementById('installmentsField').style.display = requiresInstallments ? 'block' : 'none';
+            
+            // Limpar campos quando escondidos
+            if (!requiresBrand) {
+                document.getElementById('cardBrandId').value = '';
+            }
+            if (!requiresInstallments) {
+                document.getElementById('installments').value = '';
+            }
+        }
+    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
