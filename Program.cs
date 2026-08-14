@@ -33,6 +33,12 @@ builder.Services.AddHttpContextAccessor();
 // Register FeeCalculationService
 builder.Services.AddScoped<IFeeCalculationService, FeeCalculationService>();
 
+// Register PdfReportService
+builder.Services.AddScoped<IPdfReportService, PdfReportService>();
+
+// Register BusinessDayService
+builder.Services.AddScoped<IBusinessDayService, BusinessDayService>();
+
 var app = builder.Build();
 
 // Initialize database and seed data

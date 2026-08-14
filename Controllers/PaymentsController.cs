@@ -13,15 +13,18 @@ public class PaymentsController : Controller
     private readonly ApplicationDbContext _context;
     private readonly ICurrentUserService _currentUserService;
     private readonly IFeeCalculationService _feeCalculationService;
+    private readonly IBusinessDayService _businessDayService;
 
     public PaymentsController(
         ApplicationDbContext context,
         ICurrentUserService currentUserService,
-        IFeeCalculationService feeCalculationService)
+        IFeeCalculationService feeCalculationService,
+        IBusinessDayService businessDayService)
     {
         _context = context;
         _currentUserService = currentUserService;
         _feeCalculationService = feeCalculationService;
+        _businessDayService = businessDayService;
     }
 
     // GET: Payments

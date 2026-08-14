@@ -12,11 +12,13 @@ public class ConferenceController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IPdfReportService _pdfReportService;
 
-    public ConferenceController(ApplicationDbContext context, ICurrentUserService currentUserService)
+    public ConferenceController(ApplicationDbContext context, ICurrentUserService currentUserService, IPdfReportService pdfReportService)
     {
         _context = context;
         _currentUserService = currentUserService;
+        _pdfReportService = pdfReportService;
     }
 
     // GET: Conference
@@ -128,5 +130,29 @@ public class ConferenceController : Controller
         await _context.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));
+    }
+
+    // GET: Conference/GeneratePdf
+    public IActionResult GeneratePdf(DateTime? date = null, int? unitId = null)
+    {
+        try
+        {
+            var targetDate = date ?? DateTime.UtcNow.AddDays(-1).Date;
+
+            // Converter para UTC se necessário
+            if (targetDate.Kind == DateTimeKind.Unspecified)
+            {
+                targetDate = DateTime.SpecifyKind(targetDate, DateTimeKind.Utc);
+            }
+
+            var txtBytes = _pdfReportService.GenerateDailyReport(targetDate, unitId);
+            
+            return File(txtBytes, "text/plain", $"Conciliacao_{targetDate:yyyyMMdd}.txt");
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = $"Erro ao gerar TXT: {ex.Message}";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

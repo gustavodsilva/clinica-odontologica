@@ -20,6 +20,7 @@ public class Payment
     public decimal FeeAmount { get; set; }
     public decimal NetAmountExpected { get; set; }
     public PaymentStatus Status { get; set; } = PaymentStatus.Pendente;
+    public DateTime? ExpectedReceiptDate { get; set; }
     public string? ConfirmedBy { get; set; }
     public DateTime? ConfirmedAt { get; set; }
     public string CreatedBy { get; set; } = string.Empty;
