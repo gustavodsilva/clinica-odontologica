@@ -89,13 +89,12 @@ public class HomeController : Controller
     }
 
     // Temporary endpoint to initialize database (remove after first use in production)
-    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> SeedDatabase()
     {
         try
         {
             await DbInitializer.Initialize(_context, _userManager, _roleManager);
-            return Content("Database seeded successfully!");
+            return Content("Database seeded successfully! Please remove this endpoint after first use.");
         }
         catch (Exception ex)
         {
