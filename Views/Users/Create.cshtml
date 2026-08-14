@@ -1,0 +1,64 @@
+@{
+    ViewData["Title"] = "Novo Usuário";
+}
+
+<h2>Novo Usuário</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div class="text-danger" asp-validation-summary="All"></div>
+            
+            <div class="form-group mb-3">
+                <label for="email" class="control-label">Email</label>
+                <input type="email" id="email" name="email" class="form-control" required />
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="password" class="control-label">Senha</label>
+                <input type="password" id="password" name="password" class="form-control" required />
+                <small class="text-muted">Mínimo 8 caracteres, com maiúscula, minúscula, número e caractere especial.</small>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="role" class="control-label">Role</label>
+                <select id="role" name="role" class="form-control" required onchange="toggleUnitField()">
+                    <option value="">Selecione...</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Recepcao">Recepcao</option>
+                </select>
+            </div>
+            
+            <div class="form-group mb-3" id="unitField" style="display: none;">
+                <label for="unitId" class="control-label">Unidade</label>
+                <select id="unitId" name="unitId" class="form-control">
+                    <option value="">Selecione...</option>
+                    @foreach (var unit in ViewBag.Units)
+                    {
+                        <option value="@unit.Id">@unit.Name</option>
+                    }
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Salvar" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleUnitField() {
+            var role = document.getElementById('role').value;
+            var unitField = document.getElementById('unitField');
+            if (role === 'Recepcao') {
+                unitField.style.display = 'block';
+            } else {
+                unitField.style.display = 'none';
+            }
+        }
+    </script>
+}

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ClinicaOdontologica.Models;
 
@@ -8,9 +9,14 @@ public class HomeController : Controller
 {
     public IActionResult Index()
     {
-        return View();
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return View();
+        }
+        return RedirectToAction("Login", "Account");
     }
 
+    [Authorize]
     public IActionResult Privacy()
     {
         return View();

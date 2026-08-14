@@ -1,0 +1,50 @@
+@model IEnumerable<ClinicaOdontologica.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Usuários";
+}
+
+<h2>Usuários</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Novo Usuário</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Email
+            </th>
+            <th>
+                Role
+            </th>
+            <th>
+                Unidade
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @ViewBag.UserRoles[item.Id]
+                </td>
+                <td>
+                    @(item.Unit != null ? item.Unit.Name : "Todas")
+                </td>
+                <td>
+                    @if (ViewBag.UserRoles[item.Id] != "Admin")
+                    {
+                        <span class="text-muted">Edição não implementada</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

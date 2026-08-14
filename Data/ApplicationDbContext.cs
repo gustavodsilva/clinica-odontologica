@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClinicaOdontologica.Data;
 
-public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -66,10 +66,8 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             entity.Property(e => e.FeePercentage).IsRequired().HasPrecision(5, 2);
             entity.Property(e => e.Active).IsRequired();
 
-            // Constraint única: não pode haver duas regras ativas com a mesma combinação
-            entity.HasIndex(e => new { e.PaymentMethodId, e.CardBrandId, e.Installments, e.Active })
-                .HasFilter("active = true")
-                .IsUnique();
+            // Índice para busca eficiente de regras
+            entity.HasIndex(e => new { e.PaymentMethodId, e.CardBrandId, e.Installments, e.Active });
         });
 
         // Configuração de Payment
