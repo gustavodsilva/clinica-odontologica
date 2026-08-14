@@ -1,5 +1,5 @@
-# Use .NET 8.0 SDK for building
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# Use .NET 6.0 SDK for building
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
 # Copy project file and restore dependencies
@@ -11,8 +11,8 @@ COPY . .
 WORKDIR "/src"
 RUN dotnet publish "ClinicaOdontologica.csproj" -c Release -o /app/publish
 
-# Use .NET 8.0 runtime for running
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+# Use .NET 6.0 runtime for running
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 EXPOSE 8080
