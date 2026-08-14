@@ -130,6 +130,12 @@ public class PaymentsController : Controller
             return View(payment);
         }
 
+        // Calcular data de recebimento para pagamentos com cartão
+        if (paymentMethod != null && (paymentMethod.Name.Contains("Cartão") || paymentMethod.Name.Contains("Cartao")))
+        {
+            payment.ExpectedReceiptDate = _businessDayService.GetNextBusinessDay(payment.PaymentDate);
+        }
+
         // Definir unit_id do usuário logado (nunca do formulário)
         if (currentUnitId.HasValue)
         {
@@ -143,15 +149,21 @@ public class PaymentsController : Controller
             return View(payment);
         }
 
-        payment.Status = PaymentStatus.Pendente;
-        payment.CreatedBy = currentUserId;
-        payment.CreatedAt = DateTime.UtcNow;
-
-        // Converter PaymentDate para UTC
+        // Corrigir DateTimeKind para PostgreSQL
         if (payment.PaymentDate.Kind == DateTimeKind.Unspecified)
         {
             payment.PaymentDate = DateTime.SpecifyKind(payment.PaymentDate, DateTimeKind.Utc);
         }
+
+        // Corrigir DateTimeKind para ExpectedReceiptDate
+        if (payment.ExpectedReceiptDate.HasValue && payment.ExpectedReceiptDate.Value.Kind == DateTimeKind.Unspecified)
+        {
+            payment.ExpectedReceiptDate = DateTime.SpecifyKind(payment.ExpectedReceiptDate.Value, DateTimeKind.Utc);
+        }
+
+        payment.Status = PaymentStatus.Pendente;
+        payment.CreatedBy = currentUserId;
+        payment.CreatedAt = DateTime.UtcNow;
 
         _context.Add(payment);
         await _context.SaveChangesAsync();
@@ -291,7 +303,28 @@ public class PaymentsController : Controller
             return View(payment);
         }
 
-        // Atualizar campos
+        // Recalcular data de recebimento para pagamentos com cartão
+        if (paymentMethod != null && (paymentMethod.Name.Contains("Cartão") || paymentMethod.Name.Contains("Cartao")))
+        {
+            existingPayment.ExpectedReceiptDate = _businessDayService.GetNextBusinessDay(existingPayment.PaymentDate);
+        }
+        else
+        {
+            existingPayment.ExpectedReceiptDate = null;
+        }
+
+        // Corrigir DateTimeKind para PostgreSQL
+        if (existingPayment.PaymentDate.Kind == DateTimeKind.Unspecified)
+        {
+            existingPayment.PaymentDate = DateTime.SpecifyKind(existingPayment.PaymentDate, DateTimeKind.Utc);
+        }
+
+        // Corrigir DateTimeKind para ExpectedReceiptDate
+        if (existingPayment.ExpectedReceiptDate.HasValue && existingPayment.ExpectedReceiptDate.Value.Kind == DateTimeKind.Unspecified)
+        {
+            existingPayment.ExpectedReceiptDate = DateTime.SpecifyKind(existingPayment.ExpectedReceiptDate.Value, DateTimeKind.Utc);
+        }
+
         existingPayment.PatientCode = payment.PatientCode;
         existingPayment.PaymentDate = payment.PaymentDate;
         existingPayment.GrossAmount = payment.GrossAmount;
@@ -299,8 +332,6 @@ public class PaymentsController : Controller
         existingPayment.CardBrandId = payment.CardBrandId;
         existingPayment.Installments = payment.Installments;
 
-        // Converter PaymentDate para UTC se necessário
-        if (existingPayment.PaymentDate.Kind == DateTimeKind.Unspecified)
         {
             existingPayment.PaymentDate = DateTime.SpecifyKind(existingPayment.PaymentDate, DateTimeKind.Utc);
         }
