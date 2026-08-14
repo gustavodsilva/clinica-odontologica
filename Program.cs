@@ -14,6 +14,8 @@ builder.Services.AddControllersWithViews();
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
     ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
+Console.WriteLine($"Connection String: {connectionString}");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -44,7 +46,7 @@ builder.Services.AddScoped<IBusinessDayService, BusinessDayService>();
 
 var app = builder.Build();
 
-// Initialize database and seed data
+// Initialize database and seed data (only in development)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -54,12 +56,16 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
-        await DbInitializer.Initialize(context, userManager, roleManager);
+        // Only run DbInitializer in development or if explicitly needed
+        if (builder.Environment.IsDevelopment())
+        {
+            await DbInitializer.Initialize(context, userManager, roleManager);
+        }
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ocorreu um erro ao inicializar o banco de dados.");
+        Console.WriteLine($"Ocorreu um erro ao inicializar o banco de dados.");
+        Console.WriteLine($"Erro: {ex.Message}");
     }
 }
 
