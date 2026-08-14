@@ -131,7 +131,7 @@ public class PaymentsController : Controller
         }
 
         // Calcular data de recebimento para pagamentos com cartão
-        if (paymentMethod != null && (paymentMethod.Name.Contains("Cartão") || paymentMethod.Name.Contains("Cartao")))
+        if (paymentMethod != null && paymentMethod.Name.ToLower().Contains("cart"))
         {
             payment.ExpectedReceiptDate = _businessDayService.GetNextBusinessDay(payment.PaymentDate);
         }
@@ -304,7 +304,7 @@ public class PaymentsController : Controller
         }
 
         // Recalcular data de recebimento para pagamentos com cartão
-        if (paymentMethod != null && (paymentMethod.Name.Contains("Cartão") || paymentMethod.Name.Contains("Cartao")))
+        if (paymentMethod != null && paymentMethod.Name.ToLower().Contains("cart"))
         {
             existingPayment.ExpectedReceiptDate = _businessDayService.GetNextBusinessDay(existingPayment.PaymentDate);
         }

@@ -52,7 +52,7 @@ public class PdfReportService : IPdfReportService
 
         // Separar cartões (crédito e débito)
         var cardPayments = payments.Where(p => p.PaymentMethod != null && 
-            (p.PaymentMethod.Name.Contains("Cartão") || p.PaymentMethod.Name.Contains("Cartao"))).ToList();
+            p.PaymentMethod.Name.ToLower().Contains("cart")).ToList();
 
         if (cardPayments.Any())
         {
@@ -60,9 +60,9 @@ public class PdfReportService : IPdfReportService
             sb.AppendLine("----------------------------------------");
             
             var creditCardPayments = cardPayments.Where(p => p.PaymentMethod != null && 
-                p.PaymentMethod.Name.Contains("Crédito") || p.PaymentMethod.Name.Contains("Credito")).ToList();
+                p.PaymentMethod.Name.ToLower().Contains("crédito") || p.PaymentMethod.Name.ToLower().Contains("credito")).ToList();
             var debitCardPayments = cardPayments.Where(p => p.PaymentMethod != null && 
-                p.PaymentMethod.Name.Contains("Débito") || p.PaymentMethod.Name.Contains("Debito")).ToList();
+                p.PaymentMethod.Name.ToLower().Contains("débito") || p.PaymentMethod.Name.ToLower().Contains("debito")).ToList();
 
             if (creditCardPayments.Any())
             {
