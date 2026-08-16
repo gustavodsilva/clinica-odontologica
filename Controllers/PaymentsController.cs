@@ -375,4 +375,51 @@ public class PaymentsController : Controller
         TempData["SuccessMessage"] = "Pagamento atualizado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
+
+    // GET: Payments/Delete/5
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var payment = await _context.Payments
+            .Include(p => p.Unit)
+            .Include(p => p.PaymentMethod)
+            .Include(p => p.CardBrand)
+            .FirstOrDefaultAsync(m => m.Id == id);
+        
+        if (payment == null)
+        {
+            return NotFound();
+        }
+
+        return View(payment);
+    }
+
+    // POST: Payments/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [Authorize(Roles = "Admin")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var payment = await _context.Payments.FindAsync(id);
+        if (payment == null)
+        {
+            return NotFound();
+        }
+
+        // Remover logs associados
+        var logs = _context.PaymentLogs.Where(l => l.PaymentId == id);
+        _context.PaymentLogs.RemoveRange(logs);
+
+        // Remover pagamento
+        _context.Payments.Remove(payment);
+        await _context.SaveChangesAsync();
+
+        TempData["SuccessMessage"] = "Pagamento excluído com sucesso!";
+        return RedirectToAction(nameof(Index));
+    }
 }

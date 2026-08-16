@@ -33,13 +33,13 @@ public class PdfReportService : IPdfReportService
         return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
     }
 
-    public byte[] GenerateDailyReport(DateTime date, int? unitId = null)
+    public byte[] GenerateDailyReport(DateTime startDate, DateTime endDate, int? unitId = null)
     {
         IQueryable<Payment> query = _context.Payments
             .Include(p => p.Unit)
             .Include(p => p.PaymentMethod)
             .Include(p => p.CardBrand)
-            .Where(p => p.PaymentDate.Date == date);
+            .Where(p => p.PaymentDate.Date >= startDate.Date && p.PaymentDate.Date <= endDate.Date);
 
         if (unitId.HasValue)
         {
@@ -53,8 +53,8 @@ public class PdfReportService : IPdfReportService
         // Cabeçalho do cupom fiscal
         sb.AppendLine("========================================");
         sb.AppendLine("       CLINICA RIS.O.S");
-        sb.AppendLine("   RELATORIO DE CONCILIACAO DIARIA");
-        sb.AppendLine($"   DATA: {date:dd/MM/yyyy}");
+        sb.AppendLine("   RELATORIO DE CONCILIACAO");
+        sb.AppendLine($"   PERIODO: {startDate:dd/MM/yyyy} a {endDate:dd/MM/yyyy}");
         sb.AppendLine("========================================");
         sb.AppendLine();
 

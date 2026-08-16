@@ -22,22 +22,27 @@ public class ConferenceController : Controller
     }
 
     // GET: Conference
-    public async Task<IActionResult> Index(DateTime? date = null, int? unitId = null, PaymentStatus? status = null)
+    public async Task<IActionResult> Index(DateTime? startDate = null, DateTime? endDate = null, int? unitId = null, PaymentStatus? status = null)
     {
-        // Se não informou data, usa ontem
-        var targetDate = date ?? DateTime.UtcNow.AddDays(-1).Date;
+        // Se não informou data inicial, usa ontem
+        var targetStartDate = startDate ?? DateTime.UtcNow.AddDays(-1).Date;
+        var targetEndDate = endDate ?? targetStartDate;
 
         // Converter para UTC se necessário
-        if (targetDate.Kind == DateTimeKind.Unspecified)
+        if (targetStartDate.Kind == DateTimeKind.Unspecified)
         {
-            targetDate = DateTime.SpecifyKind(targetDate, DateTimeKind.Utc);
+            targetStartDate = DateTime.SpecifyKind(targetStartDate, DateTimeKind.Utc);
+        }
+        if (targetEndDate.Kind == DateTimeKind.Unspecified)
+        {
+            targetEndDate = DateTime.SpecifyKind(targetEndDate, DateTimeKind.Utc);
         }
 
         IQueryable<Payment> query = _context.Payments
             .Include(p => p.Unit)
             .Include(p => p.PaymentMethod)
             .Include(p => p.CardBrand)
-            .Where(p => p.PaymentDate.Date == targetDate);
+            .Where(p => p.PaymentDate.Date >= targetStartDate.Date && p.PaymentDate.Date <= targetEndDate.Date);
 
         // Filtro por unidade
         if (unitId.HasValue)
@@ -54,7 +59,8 @@ public class ConferenceController : Controller
         var payments = await query.OrderByDescending(p => p.CreatedAt).ToListAsync();
         var units = await _context.Units.Where(u => u.Active).ToListAsync();
 
-        ViewBag.TargetDate = targetDate;
+        ViewBag.StartDate = targetStartDate;
+        ViewBag.EndDate = targetEndDate;
         ViewBag.SelectedUnitId = unitId;
         ViewBag.SelectedStatus = status;
         ViewBag.Units = units;
@@ -133,21 +139,26 @@ public class ConferenceController : Controller
     }
 
     // GET: Conference/GeneratePdf
-    public IActionResult GeneratePdf(DateTime? date = null, int? unitId = null)
+    public IActionResult GeneratePdf(DateTime? startDate = null, DateTime? endDate = null, int? unitId = null)
     {
         try
         {
-            var targetDate = date ?? DateTime.UtcNow.AddDays(-1).Date;
+            var targetStartDate = startDate ?? DateTime.UtcNow.AddDays(-1).Date;
+            var targetEndDate = endDate ?? targetStartDate;
 
             // Converter para UTC se necessário
-            if (targetDate.Kind == DateTimeKind.Unspecified)
+            if (targetStartDate.Kind == DateTimeKind.Unspecified)
             {
-                targetDate = DateTime.SpecifyKind(targetDate, DateTimeKind.Utc);
+                targetStartDate = DateTime.SpecifyKind(targetStartDate, DateTimeKind.Utc);
+            }
+            if (targetEndDate.Kind == DateTimeKind.Unspecified)
+            {
+                targetEndDate = DateTime.SpecifyKind(targetEndDate, DateTimeKind.Utc);
             }
 
-            var txtBytes = _pdfReportService.GenerateDailyReport(targetDate, unitId);
+            var txtBytes = _pdfReportService.GenerateDailyReport(targetStartDate, targetEndDate, unitId);
             
-            return File(txtBytes, "text/plain", $"Conciliacao_{targetDate:yyyyMMdd}.txt");
+            return File(txtBytes, "text/plain", $"Conciliacao_{targetStartDate:yyyyMMdd}_ate_{targetEndDate:yyyyMMdd}.txt");
         }
         catch (Exception ex)
         {

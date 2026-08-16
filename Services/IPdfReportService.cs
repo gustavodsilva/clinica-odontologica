@@ -2,5 +2,5 @@ namespace ClinicaOdontologica.Services;
 
 public interface IPdfReportService
 {
-    byte[] GenerateDailyReport(DateTime date, int? unitId = null);
+    byte[] GenerateDailyReport(DateTime startDate, DateTime endDate, int? unitId = null);
 }

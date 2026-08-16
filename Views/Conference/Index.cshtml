@@ -16,9 +16,13 @@
 
 <form method="get" class="mb-3">
     <div class="row">
-        <div class="col-md-3">
-            <label for="date" class="form-label">Data</label>
-            <input type="date" id="date" name="date" class="form-control" value="@ViewBag.TargetDate.ToString("yyyy-MM-dd")" />
+        <div class="col-md-2">
+            <label for="startDate" class="form-label">Data Inicial</label>
+            <input type="date" id="startDate" name="startDate" class="form-control" value="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-2">
+            <label for="endDate" class="form-label">Data Final</label>
+            <input type="date" id="endDate" name="endDate" class="form-control" value="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" />
         </div>
         <div class="col-md-3">
             <label for="unitId" class="form-label">Unidade</label>
@@ -30,7 +34,7 @@
                 }
             </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label for="status" class="form-label">Status</label>
             <select id="status" name="status" class="form-select">
                 <option value="">Todos</option>
@@ -42,7 +46,7 @@
             <button type="submit" class="btn btn-primary">Filtrar</button>
         </div>
         <div class="col-md-1 d-flex align-items-end">
-            <a asp-action="GeneratePdf" asp-route-date="@ViewBag.TargetDate" asp-route-unitId="@ViewBag.SelectedUnitId" class="btn btn-success">
+            <a asp-action="GeneratePdf" asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" asp-route-unitId="@ViewBag.SelectedUnitId" class="btn btn-success">
                 <i class="bi bi-file-earmark-text"></i> TXT
             </a>
         </div>

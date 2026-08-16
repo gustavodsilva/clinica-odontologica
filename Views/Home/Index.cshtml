@@ -22,7 +22,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <div class="card bg-light">
                                     <div class="card-body text-center">
                                         <h6>Total de Pagamentos</h6>
@@ -30,23 +30,26 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h6>Pendentes</h6>
-                                        <h3 class="text-warning">@Model.PendingPayments</h3>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="col-md-3">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h6>Pendentes</h6>
+                                            <h3 class="text-warning">@Model.PendingPayments</h3>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h6>Conferidos (OK)</h6>
-                                        <h3 class="text-success">@Model.ConfirmedPayments</h3>
+                                <div class="col-md-3">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h6>Conferidos (OK)</h6>
+                                            <h3 class="text-success">@Model.ConfirmedPayments</h3>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-3">
+                            }
+                            <div class="col-md-6">
                                 <div class="card bg-light">
                                     <div class="card-body text-center">
                                         <h6>Total Bruto</h6>

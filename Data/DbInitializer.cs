@@ -137,7 +137,7 @@ public static class DbInitializer
             }
         }
 
-        // Criar usuário debora se não existir
+        // Criar usuário debora se não existir ou atualizar se não tiver unidade
         var deboraUser = await userManager.FindByEmailAsync("debora@clinicarisos.com.br");
         if (deboraUser == null && palmeirasUnit != null)
         {
@@ -153,6 +153,12 @@ public static class DbInitializer
             {
                 await userManager.AddToRoleAsync(deboraUser, "Recepcao");
             }
+        }
+        else if (deboraUser != null && deboraUser.UnitId == null && palmeirasUnit != null)
+        {
+            // Atualizar UnitId se usuário existir mas não tiver unidade vinculada
+            deboraUser.UnitId = palmeirasUnit.Id;
+            await userManager.UpdateAsync(deboraUser);
         }
 
         // Criar usuário beatriz se não existir
