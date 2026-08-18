@@ -80,6 +80,10 @@ public class PaymentsController : Controller
     {
         var currentUnitId = _currentUserService.GetCurrentUnitId();
         var currentUserId = _currentUserService.GetCurrentUserId();
+        var currentUserEmail = User.Identity?.Name ?? currentUserId;
+
+        Console.WriteLine($"[DEBUG] Create Payment - User: {currentUserEmail}, UnitId: {currentUnitId}");
+        Console.WriteLine($"[DEBUG] Payment Data - PatientCode: {payment.PatientCode}, Amount: {payment.GrossAmount}, Date: {payment.PaymentDate}");
 
         // Validações
         if (string.IsNullOrWhiteSpace(payment.PatientCode))
@@ -122,6 +126,7 @@ public class PaymentsController : Controller
 
         if (!ModelState.IsValid)
         {
+            Console.WriteLine($"[DEBUG] ModelState Invalid: {string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage))}");
             ViewBag.PaymentMethods = _context.PaymentMethods.Where(p => p.Active).ToList();
             ViewBag.CardBrands = _context.CardBrands.Where(c => c.Active).ToList();
             return View(payment);
@@ -139,9 +144,11 @@ public class PaymentsController : Controller
             payment.FeePercentageApplied = feePercentage;
             payment.FeeAmount = feeAmount;
             payment.NetAmountExpected = netAmount;
+            Console.WriteLine($"[DEBUG] Fee Calculated - Percentage: {feePercentage}%, Amount: {feeAmount}, Net: {netAmount}");
         }
         catch (InvalidOperationException ex)
         {
+            Console.WriteLine($"[DEBUG] Fee Calculation Error: {ex.Message}");
             ModelState.AddModelError("", ex.Message);
             ViewBag.PaymentMethods = _context.PaymentMethods.Where(p => p.Active).ToList();
             ViewBag.CardBrands = _context.CardBrands.Where(c => c.Active).ToList();
@@ -163,9 +170,11 @@ public class PaymentsController : Controller
         if (currentUnitId.HasValue)
         {
             payment.UnitId = currentUnitId.Value;
+            Console.WriteLine($"[DEBUG] UnitId set: {currentUnitId.Value}");
         }
         else
         {
+            Console.WriteLine($"[DEBUG] ERROR: User has no UnitId");
             ModelState.AddModelError("", "Usuário não está vinculado a uma unidade.");
             ViewBag.PaymentMethods = _context.PaymentMethods.Where(p => p.Active).ToList();
             ViewBag.CardBrands = _context.CardBrands.Where(c => c.Active).ToList();
@@ -188,8 +197,23 @@ public class PaymentsController : Controller
         payment.CreatedBy = currentUserId;
         payment.CreatedAt = DateTime.UtcNow;
 
+        Console.WriteLine($"[DEBUG] Saving payment to database...");
         _context.Add(payment);
-        await _context.SaveChangesAsync();
+        
+        try
+        {
+            await _context.SaveChangesAsync();
+            Console.WriteLine($"[DEBUG] Payment saved successfully. ID: {payment.Id}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[DEBUG] ERROR saving payment: {ex.Message}");
+            Console.WriteLine($"[DEBUG] Stack trace: {ex.StackTrace}");
+            ModelState.AddModelError("", "Erro ao salvar pagamento: " + ex.Message);
+            ViewBag.PaymentMethods = _context.PaymentMethods.Where(p => p.Active).ToList();
+            ViewBag.CardBrands = _context.CardBrands.Where(c => c.Active).ToList();
+            return View(payment);
+        }
 
         // Criar log de criação
         var log = new PaymentLog
@@ -200,7 +224,16 @@ public class PaymentsController : Controller
             ChangedAt = DateTime.UtcNow
         };
         _context.PaymentLogs.Add(log);
-        await _context.SaveChangesAsync();
+        
+        try
+        {
+            await _context.SaveChangesAsync();
+            Console.WriteLine($"[DEBUG] Log saved successfully");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[DEBUG] ERROR saving log: {ex.Message}");
+        }
 
         TempData["SuccessMessage"] = "Pagamento lançado com sucesso!";
         return RedirectToAction(nameof(Index));

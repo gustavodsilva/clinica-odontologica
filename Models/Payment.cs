@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ClinicaOdontologica.Models;
 
 public enum PaymentStatus
@@ -10,10 +12,19 @@ public class Payment
 {
     public int Id { get; set; }
     public int UnitId { get; set; }
+    
+    [Display(Name = "Código do Paciente")]
     public string PatientCode { get; set; } = string.Empty;
+    
+    [Display(Name = "Data de Pagamento")]
     public DateTime PaymentDate { get; set; }
+    
+    [Display(Name = "Valor Bruto")]
     public decimal GrossAmount { get; set; }
+    
+    [Display(Name = "Forma de Pagamento")]
     public int PaymentMethodId { get; set; }
+    
     public int? CardBrandId { get; set; }
     public int? Installments { get; set; }
     public decimal FeePercentageApplied { get; set; }

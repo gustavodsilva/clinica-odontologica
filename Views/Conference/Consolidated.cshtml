@@ -1,0 +1,153 @@
+@model dynamic
+
+@{
+    ViewData["Title"] = "Conferência Consolidada";
+}
+
+<h2>Conferência Consolidada por Forma de Pagamento</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="mb-3">
+    <a asp-action="Index" asp-route-view="detailed" asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" asp-route-unitId="@ViewBag.SelectedUnitId" asp-route-status="@ViewBag.SelectedStatus" class="btn btn-info">
+        <i class="bi bi-list"></i> Ver Lançamentos Detalhados
+    </a>
+</div>
+
+<form method="get" class="mb-3">
+    <div class="row">
+        <div class="col-md-2">
+            <label for="startDate" class="form-label">Data Inicial</label>
+            <input type="date" id="startDate" name="startDate" class="form-control" value="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-2">
+            <label for="endDate" class="form-label">Data Final</label>
+            <input type="date" id="endDate" name="endDate" class="form-control" value="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-3">
+            <label for="unitId" class="form-label">Unidade</label>
+            <select id="unitId" name="unitId" class="form-select">
+                <option value="">Todas</option>
+                @foreach (var unit in ViewBag.Units)
+                {
+                    <option value="@unit.Id" selected="@(ViewBag.SelectedUnitId == unit.Id ? "selected" : null)">@unit.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="status" class="form-label">Status</label>
+            <select id="status" name="status" class="form-select">
+                <option value="">Todos</option>
+                <option value="0" selected="@(ViewBag.SelectedStatus == ClinicaOdontologica.Models.PaymentStatus.Pendente ? "selected" : null)">Pendente</option>
+                <option value="1" selected="@(ViewBag.SelectedStatus == ClinicaOdontologica.Models.PaymentStatus.OK ? "selected" : null)">OK</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+            <a asp-action="GeneratePdf" asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" asp-route-unitId="@ViewBag.SelectedUnitId" class="btn btn-success">
+                <i class="bi bi-file-earmark-text"></i> TXT
+            </a>
+        </div>
+    </div>
+</form>
+
+@if (Model != null && Model.Count > 0)
+{
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Forma de Pagamento</th>
+                <th>Qtd. Lançamentos</th>
+                <th>Valor Bruto</th>
+                <th>Valor Líquido</th>
+                <th>Pendentes (Qtd/Valor)</th>
+                <th>Conferidos (Qtd/Valor)</th>
+                <th>Status Consolidado</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <strong>@item.PaymentMethodName</strong>
+                    </td>
+                    <td>@item.Count</td>
+                    <td>@item.GrossAmount.ToString("C2")</td>
+                    <td>@item.NetAmount.ToString("C2")</td>
+                    <td>
+                        @item.PendingCount lançamentos<br />
+                        <small>@item.PendingAmount.ToString("C2")</small>
+                    </td>
+                    <td>
+                        @item.ConfirmedCount lançamentos<br />
+                        <small>@item.ConfirmedAmount.ToString("C2")</small>
+                    </td>
+                    <td>
+                        @if (item.PendingCount == 0)
+                        {
+                            <span class="badge bg-success">Tudo Conferido</span>
+                        }
+                        else if (item.ConfirmedCount == 0)
+                        {
+                            <span class="badge bg-warning">Tudo Pendente</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-info">Parcial</span>
+                        }
+                    </td>
+                    <td>
+                        @if (item.PendingCount > 0)
+                        {
+                            <form asp-action="ConfirmConsolidated" asp-route-paymentMethodId="@item.PaymentMethodId" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-success">Marcar Tudo OK</button>
+                            </form>
+                        }
+                        @if (item.ConfirmedCount > 0)
+                        {
+                            <form asp-action="UnconfirmConsolidated" asp-route-paymentMethodId="@item.PaymentMethodId" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-warning">Marcar Tudo Pendente</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot class="table-dark">
+            <tr>
+                <td><strong>TOTAL</strong></td>
+                <td><strong>@Model.Sum(m => (int)m.Count)</strong></td>
+                <td><strong>@Model.Sum(m => (decimal)m.GrossAmount).ToString("C2")</strong></td>
+                <td><strong>@Model.Sum(m => (decimal)m.NetAmount).ToString("C2")</strong></td>
+                <td>
+                    <strong>@Model.Sum(m => (int)m.PendingCount)</strong><br />
+                    <small>@Model.Sum(m => (decimal)m.PendingAmount).ToString("C2")</small>
+                </td>
+                <td>
+                    <strong>@Model.Sum(m => (int)m.ConfirmedCount)</strong><br />
+                    <small>@Model.Sum(m => (decimal)m.ConfirmedAmount).ToString("C2")</small>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        Nenhum pagamento encontrado para o período selecionado.
+    </div>
+}
