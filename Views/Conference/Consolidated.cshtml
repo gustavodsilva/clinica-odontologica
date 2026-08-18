@@ -1,4 +1,4 @@
-@model dynamic
+@model List<ClinicaOdontologica.Models.ConferenceConsolidatedViewModel>
 
 @{
     ViewData["Title"] = "Conferência Consolidada";
@@ -128,16 +128,16 @@
         <tfoot class="table-dark">
             <tr>
                 <td><strong>TOTAL</strong></td>
-                <td><strong>@Model.Sum(m => (int)m.Count)</strong></td>
-                <td><strong>@Model.Sum(m => (decimal)m.GrossAmount).ToString("C2")</strong></td>
-                <td><strong>@Model.Sum(m => (decimal)m.NetAmount).ToString("C2")</strong></td>
+                <td><strong>@Model.Sum(m => m.Count)</strong></td>
+                <td><strong>@Model.Sum(m => m.GrossAmount).ToString("C2")</strong></td>
+                <td><strong>@Model.Sum(m => m.NetAmount).ToString("C2")</strong></td>
                 <td>
-                    <strong>@Model.Sum(m => (int)m.PendingCount)</strong><br />
-                    <small>@Model.Sum(m => (decimal)m.PendingAmount).ToString("C2")</small>
+                    <strong>@Model.Sum(m => m.PendingCount)</strong><br />
+                    <small>@Model.Sum(m => m.PendingAmount).ToString("C2")</small>
                 </td>
                 <td>
-                    <strong>@Model.Sum(m => (int)m.ConfirmedCount)</strong><br />
-                    <small>@Model.Sum(m => (decimal)m.ConfirmedAmount).ToString("C2")</small>
+                    <strong>@Model.Sum(m => m.ConfirmedCount)</strong><br />
+                    <small>@Model.Sum(m => m.ConfirmedAmount).ToString("C2")</small>
                 </td>
                 <td></td>
                 <td></td>

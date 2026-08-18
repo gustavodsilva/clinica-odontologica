@@ -62,7 +62,7 @@ public class ConferenceController : Controller
         // Agrupar por forma de pagamento para visão consolidada
         var consolidated = payments
             .GroupBy(p => new { p.PaymentMethodId, PaymentMethodName = p.PaymentMethod?.Name ?? "Sem Forma" })
-            .Select(g => new
+            .Select(g => new ConferenceConsolidatedViewModel
             {
                 PaymentMethodId = g.Key.PaymentMethodId,
                 PaymentMethodName = g.Key.PaymentMethodName,
