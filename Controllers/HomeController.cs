@@ -50,7 +50,7 @@ public class HomeController : Controller
             if (isAdmin)
             {
                 var paymentsByUnit = await _context.Payments
-                    .Where(p => p.PaymentDate.Date == today)
+                    .Where(p => p.PaymentDate.Date == today && p.Unit != null)
                     .Include(p => p.Unit)
                     .GroupBy(p => p.UnitId)
                     .Select(g => new PaymentByUnitSummary
