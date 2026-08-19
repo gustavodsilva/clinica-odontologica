@@ -28,6 +28,16 @@ public class ConferenceController : Controller
         var targetStartDate = startDate ?? DateTime.UtcNow.Date;
         var targetEndDate = endDate ?? targetStartDate;
 
+        // Converter datas do frontend para UTC
+        if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
+        {
+            targetStartDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Utc);
+        }
+        if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
+        {
+            targetEndDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Utc);
+        }
+
         IQueryable<Payment> query = _context.Payments
             .Include(p => p.Unit)
             .Include(p => p.PaymentMethod)
@@ -161,6 +171,16 @@ public class ConferenceController : Controller
         var targetStartDate = startDate ?? DateTime.UtcNow.Date;
         var targetEndDate = endDate ?? targetStartDate;
 
+        // Converter datas do frontend para UTC
+        if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
+        {
+            targetStartDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Utc);
+        }
+        if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
+        {
+            targetEndDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Utc);
+        }
+
         var currentUserId = _currentUserService.GetCurrentUserId();
         var currentUserEmail = User.Identity?.Name ?? currentUserId;
 
@@ -209,6 +229,16 @@ public class ConferenceController : Controller
         var targetStartDate = startDate ?? DateTime.UtcNow.Date;
         var targetEndDate = endDate ?? targetStartDate;
 
+        // Converter datas do frontend para UTC
+        if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
+        {
+            targetStartDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Utc);
+        }
+        if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
+        {
+            targetEndDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Utc);
+        }
+
         var currentUserId = _currentUserService.GetCurrentUserId();
         var currentUserEmail = User.Identity?.Name ?? currentUserId;
 
@@ -256,6 +286,16 @@ public class ConferenceController : Controller
         {
             var targetStartDate = startDate ?? DateTime.UtcNow.Date;
             var targetEndDate = endDate ?? targetStartDate;
+
+            // Converter datas do frontend para UTC
+            if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
+            {
+                targetStartDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Utc);
+            }
+            if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
+            {
+                targetEndDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Utc);
+            }
 
             var txtBytes = _pdfReportService.GenerateDailyReport(targetStartDate, targetEndDate, unitId);
             
