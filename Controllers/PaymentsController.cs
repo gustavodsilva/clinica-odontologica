@@ -46,7 +46,7 @@ public class PaymentsController : Controller
     }
 
     // GET: Payments
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(DateTime? startDate = null, DateTime? endDate = null)
     {
         var currentUserId = _currentUserService.GetCurrentUserId();
         var isAdmin = _currentUserService.IsAdmin();
@@ -61,6 +61,28 @@ public class PaymentsController : Controller
         {
             query = query.Where(p => p.CreatedBy == currentUserId);
         }
+
+        // Filtro por período de data
+        if (startDate.HasValue && endDate.HasValue)
+        {
+            // Converter datas do frontend para UTC
+            var targetStartDate = startDate.Value;
+            var targetEndDate = endDate.Value;
+
+            if (startDate.Value.Kind == DateTimeKind.Unspecified)
+            {
+                targetStartDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Utc);
+            }
+            if (endDate.Value.Kind == DateTimeKind.Unspecified)
+            {
+                targetEndDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Utc);
+            }
+
+            query = query.Where(p => p.PaymentDate.Date >= targetStartDate.Date && p.PaymentDate.Date <= targetEndDate.Date);
+        }
+
+        ViewBag.StartDate = startDate;
+        ViewBag.EndDate = endDate;
 
         return View(await query.OrderByDescending(p => p.CreatedAt).ToListAsync());
     }

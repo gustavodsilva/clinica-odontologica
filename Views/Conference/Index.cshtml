@@ -10,6 +10,9 @@
     <a asp-action="Index" asp-route-view="consolidated" asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" asp-route-unitId="@ViewBag.SelectedUnitId" asp-route-status="@ViewBag.SelectedStatus" class="btn btn-primary">
         <i class="bi bi-bar-chart"></i> Voltar para Conferência Consolidada
     </a>
+    <a asp-controller="Payments" asp-action="Index" asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-info">
+        <i class="bi bi-list"></i> Ver na Aba Pagamentos
+    </a>
 </div>
 
 @if (TempData["ErrorMessage"] != null)

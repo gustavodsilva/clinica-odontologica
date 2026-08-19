@@ -14,6 +14,14 @@
     </div>
 }
 
+@if (ViewBag.StartDate != null && ViewBag.EndDate != null)
+{
+    <div class="alert alert-info">
+        <strong>Filtro ativo:</strong> @ViewBag.StartDate.ToString("dd/MM/yyyy") até @ViewBag.EndDate.ToString("dd/MM/yyyy")
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary ms-2">Limpar filtro</a>
+    </div>
+}
+
 <p>
     <a asp-action="Create" class="btn btn-primary">Novo Pagamento</a>
 </p>

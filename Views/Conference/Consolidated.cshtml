@@ -15,7 +15,7 @@
 }
 
 <div class="mb-3">
-    <a asp-action="Index" asp-route-view="detailed" asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" asp-route-unitId="@ViewBag.SelectedUnitId" asp-route-status="@ViewBag.SelectedStatus" class="btn btn-info">
+    <a asp-controller="Payments" asp-action="Index" asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" class="btn btn-info">
         <i class="bi bi-list"></i> Ver Lançamentos Detalhados
     </a>
 </div>
