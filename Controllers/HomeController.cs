@@ -23,7 +23,7 @@ public class HomeController : Controller
     {
         if (User.Identity?.IsAuthenticated == true)
         {
-            var today = DateTime.UtcNow.Date;
+            var today = DateTime.Now.Date;
             var isAdmin = _currentUserService.IsAdmin();
             var currentUnitId = _currentUserService.GetCurrentUnitId();
 

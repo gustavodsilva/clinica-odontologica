@@ -25,7 +25,7 @@ public class ConferenceController : Controller
     public async Task<IActionResult> Index(DateTime? startDate = null, DateTime? endDate = null, int? unitId = null, PaymentStatus? status = null, string view = "consolidated")
     {
         // Se não informou data inicial, usa hoje
-        var targetStartDate = startDate ?? DateTime.UtcNow.Date;
+        var targetStartDate = startDate ?? DateTime.Now.Date;
         var targetEndDate = endDate ?? targetStartDate;
 
         // Converter para UTC se necessário
@@ -168,7 +168,7 @@ public class ConferenceController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ConfirmConsolidated(int paymentMethodId, DateTime? startDate = null, DateTime? endDate = null, int? unitId = null, PaymentStatus? status = null)
     {
-        var targetStartDate = startDate ?? DateTime.UtcNow.Date;
+        var targetStartDate = startDate ?? DateTime.Now.Date;
         var targetEndDate = endDate ?? targetStartDate;
 
         if (targetStartDate.Kind == DateTimeKind.Unspecified)
@@ -225,7 +225,7 @@ public class ConferenceController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UnconfirmConsolidated(int paymentMethodId, DateTime? startDate = null, DateTime? endDate = null, int? unitId = null, PaymentStatus? status = null)
     {
-        var targetStartDate = startDate ?? DateTime.UtcNow.Date;
+        var targetStartDate = startDate ?? DateTime.Now.Date;
         var targetEndDate = endDate ?? targetStartDate;
 
         if (targetStartDate.Kind == DateTimeKind.Unspecified)
@@ -282,7 +282,7 @@ public class ConferenceController : Controller
     {
         try
         {
-            var targetStartDate = startDate ?? DateTime.UtcNow.Date;
+            var targetStartDate = startDate ?? DateTime.Now.Date;
             var targetEndDate = endDate ?? targetStartDate;
 
             // Converter para UTC se necessário

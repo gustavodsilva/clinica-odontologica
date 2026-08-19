@@ -96,7 +96,7 @@ public class PaymentsController : Controller
             ModelState.AddModelError("GrossAmount", "Valor deve ser maior que zero.");
         }
 
-        if (payment.PaymentDate > DateTime.UtcNow.Date.AddDays(1))
+        if (payment.PaymentDate > DateTime.Now.Date.AddDays(1))
         {
             ModelState.AddModelError("PaymentDate", "Data de pagamento não pode ser futura.");
         }
@@ -303,7 +303,7 @@ public class PaymentsController : Controller
             ModelState.AddModelError("GrossAmount", "Valor deve ser maior que zero.");
         }
 
-        if (payment.PaymentDate > DateTime.UtcNow.Date.AddDays(1))
+        if (payment.PaymentDate > DateTime.Now.Date.AddDays(1))
         {
             ModelState.AddModelError("PaymentDate", "Data de pagamento não pode ser futura.");
         }

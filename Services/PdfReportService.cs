@@ -69,14 +69,64 @@ public class PdfReportService : IPdfReportService
         sb.AppendLine("========================================");
         sb.AppendLine();
 
+        // Resumo por forma de pagamento
+        sb.AppendLine("RESUMO POR FORMA DE PAGAMENTO:");
+        sb.AppendLine("------------------------------");
+
+        var paymentsByMethod = payments
+            .Where(p => p.PaymentMethod != null)
+            .GroupBy(p => new { p.PaymentMethodId, p.PaymentMethod!.Name })
+            .OrderBy(g => g.Key.Name)
+            .ToList();
+
+        foreach (var group in paymentsByMethod)
+        {
+            var methodName = group.Key.Name.ToUpper();
+            var count = group.Count();
+            var grossTotal = group.Sum(p => p.GrossAmount);
+            var netTotal = group.Sum(p => p.NetAmountExpected);
+            var pendingCount = group.Count(p => p.Status == PaymentStatus.Pendente);
+            var confirmedCount = group.Count(p => p.Status == PaymentStatus.OK);
+
+            sb.AppendLine($"{methodName}:");
+            sb.AppendLine($"Quantidade: {count}");
+            sb.AppendLine($"Valor Bruto Total: {grossTotal:C2}");
+            sb.AppendLine($"Valor Liquido Total: {netTotal:C2}");
+
+            // Status da conferência (se não for cartão)
+            if (!RemoveAccents(methodName).Contains("CARTAO"))
+            {
+                if (pendingCount == 0)
+                {
+                    sb.AppendLine($"Status: OK");
+                }
+                else if (confirmedCount == 0)
+                {
+                    sb.AppendLine($"Status: Pendente");
+                }
+                else
+                {
+                    sb.AppendLine($"Status: Parcial ({confirmedCount} OK, {pendingCount} Pendente)");
+                }
+            }
+
+            sb.AppendLine();
+        }
+
+        sb.AppendLine("========================================");
+        sb.AppendLine();
+
         // Separar cartões (crédito e débito)
         var cardPayments = payments.Where(p => p.PaymentMethod != null && 
             RemoveAccents(p.PaymentMethod.Name.ToLower()).Contains("cartao")).ToList();
 
         if (cardPayments.Any())
         {
-            sb.AppendLine("RESUMO DE CARTOES:");
-            sb.AppendLine("----------------------------------------");
+            sb.AppendLine("CARTOES:");
+            sb.AppendLine($"Quantidade: {cardPayments.Count}");
+            sb.AppendLine($"Valor Bruto Total: {cardPayments.Sum(p => p.GrossAmount):C2}");
+            sb.AppendLine($"Valor Liquido Total: {cardPayments.Sum(p => p.NetAmountExpected):C2}");
+            sb.AppendLine();
             
             var creditCardPayments = cardPayments.Where(p => p.PaymentMethod != null && 
                 RemoveAccents(p.PaymentMethod.Name.ToLower()).Contains("credito")).ToList();
@@ -87,6 +137,7 @@ public class PdfReportService : IPdfReportService
             {
                 sb.AppendLine("CARTAO DE CREDITO:");
                 sb.AppendLine($"Quantidade: {creditCardPayments.Count}");
+                sb.AppendLine($"Valor Bruto Total: {creditCardPayments.Sum(p => p.GrossAmount):C2}");
                 sb.AppendLine($"Valor Liquido Total: {creditCardPayments.Sum(p => p.NetAmountExpected):C2}");
                 
                 // Agrupar por data de recebimento esperada
@@ -96,7 +147,7 @@ public class PdfReportService : IPdfReportService
                 
                 foreach (var group in byReceiptDate)
                 {
-                    sb.AppendLine($"   A receber em {group.Key:dd/MM/yyyy}: {group.Sum(p => p.NetAmountExpected):C2}");
+                    sb.AppendLine($"A receber em {group.Key:dd/MM/yyyy}: {group.Sum(p => p.NetAmountExpected):C2}");
                 }
                 sb.AppendLine();
             }
@@ -105,6 +156,7 @@ public class PdfReportService : IPdfReportService
             {
                 sb.AppendLine("CARTAO DE DEBITO:");
                 sb.AppendLine($"Quantidade: {debitCardPayments.Count}");
+                sb.AppendLine($"Valor Bruto Total: {debitCardPayments.Sum(p => p.GrossAmount):C2}");
                 sb.AppendLine($"Valor Liquido Total: {debitCardPayments.Sum(p => p.NetAmountExpected):C2}");
                 
                 // Agrupar por data de recebimento esperada
@@ -114,7 +166,7 @@ public class PdfReportService : IPdfReportService
                 
                 foreach (var group in byReceiptDate)
                 {
-                    sb.AppendLine($"   A receber em {group.Key:dd/MM/yyyy}: {group.Sum(p => p.NetAmountExpected):C2}");
+                    sb.AppendLine($"A receber em {group.Key:dd/MM/yyyy}: {group.Sum(p => p.NetAmountExpected):C2}");
                 }
                 sb.AppendLine();
             }
