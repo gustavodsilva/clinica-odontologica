@@ -109,14 +109,14 @@
                     <td>
                         @if (item.PendingCount > 0)
                         {
-                            <form asp-action="ConfirmConsolidated" asp-route-paymentMethodId="@item.PaymentMethodId" method="post" class="d-inline">
+                            <form asp-action="ConfirmConsolidated" asp-route-paymentMethodId="@item.PaymentMethodId" asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" asp-route-unitId="@ViewBag.SelectedUnitId" asp-route-status="@ViewBag.SelectedStatus" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="btn btn-sm btn-success">Marcar Tudo OK</button>
                             </form>
                         }
                         @if (item.ConfirmedCount > 0)
                         {
-                            <form asp-action="UnconfirmConsolidated" asp-route-paymentMethodId="@item.PaymentMethodId" method="post" class="d-inline">
+                            <form asp-action="UnconfirmConsolidated" asp-route-paymentMethodId="@item.PaymentMethodId" asp-route-startDate="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" asp-route-endDate="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" asp-route-unitId="@ViewBag.SelectedUnitId" asp-route-status="@ViewBag.SelectedStatus" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="btn btn-sm btn-warning">Marcar Tudo Pendente</button>
                             </form>
