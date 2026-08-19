@@ -25,18 +25,8 @@ public class ConferenceController : Controller
     public async Task<IActionResult> Index(DateTime? startDate = null, DateTime? endDate = null, int? unitId = null, PaymentStatus? status = null, string view = "consolidated")
     {
         // Se não informou data inicial, usa hoje
-        var targetStartDate = startDate ?? DateTime.Now.Date;
+        var targetStartDate = startDate ?? DateTime.UtcNow.Date;
         var targetEndDate = endDate ?? targetStartDate;
-
-        // Converter para UTC se necessário
-        if (targetStartDate.Kind == DateTimeKind.Unspecified)
-        {
-            targetStartDate = DateTime.SpecifyKind(targetStartDate, DateTimeKind.Utc);
-        }
-        if (targetEndDate.Kind == DateTimeKind.Unspecified)
-        {
-            targetEndDate = DateTime.SpecifyKind(targetEndDate, DateTimeKind.Utc);
-        }
 
         IQueryable<Payment> query = _context.Payments
             .Include(p => p.Unit)
@@ -168,17 +158,8 @@ public class ConferenceController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ConfirmConsolidated(int paymentMethodId, DateTime? startDate = null, DateTime? endDate = null, int? unitId = null, PaymentStatus? status = null)
     {
-        var targetStartDate = startDate ?? DateTime.Now.Date;
+        var targetStartDate = startDate ?? DateTime.UtcNow.Date;
         var targetEndDate = endDate ?? targetStartDate;
-
-        if (targetStartDate.Kind == DateTimeKind.Unspecified)
-        {
-            targetStartDate = DateTime.SpecifyKind(targetStartDate, DateTimeKind.Utc);
-        }
-        if (targetEndDate.Kind == DateTimeKind.Unspecified)
-        {
-            targetEndDate = DateTime.SpecifyKind(targetEndDate, DateTimeKind.Utc);
-        }
 
         var currentUserId = _currentUserService.GetCurrentUserId();
         var currentUserEmail = User.Identity?.Name ?? currentUserId;
@@ -225,17 +206,8 @@ public class ConferenceController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UnconfirmConsolidated(int paymentMethodId, DateTime? startDate = null, DateTime? endDate = null, int? unitId = null, PaymentStatus? status = null)
     {
-        var targetStartDate = startDate ?? DateTime.Now.Date;
+        var targetStartDate = startDate ?? DateTime.UtcNow.Date;
         var targetEndDate = endDate ?? targetStartDate;
-
-        if (targetStartDate.Kind == DateTimeKind.Unspecified)
-        {
-            targetStartDate = DateTime.SpecifyKind(targetStartDate, DateTimeKind.Utc);
-        }
-        if (targetEndDate.Kind == DateTimeKind.Unspecified)
-        {
-            targetEndDate = DateTime.SpecifyKind(targetEndDate, DateTimeKind.Utc);
-        }
 
         var currentUserId = _currentUserService.GetCurrentUserId();
         var currentUserEmail = User.Identity?.Name ?? currentUserId;
@@ -282,18 +254,8 @@ public class ConferenceController : Controller
     {
         try
         {
-            var targetStartDate = startDate ?? DateTime.Now.Date;
+            var targetStartDate = startDate ?? DateTime.UtcNow.Date;
             var targetEndDate = endDate ?? targetStartDate;
-
-            // Converter para UTC se necessário
-            if (targetStartDate.Kind == DateTimeKind.Unspecified)
-            {
-                targetStartDate = DateTime.SpecifyKind(targetStartDate, DateTimeKind.Utc);
-            }
-            if (targetEndDate.Kind == DateTimeKind.Unspecified)
-            {
-                targetEndDate = DateTime.SpecifyKind(targetEndDate, DateTimeKind.Utc);
-            }
 
             var txtBytes = _pdfReportService.GenerateDailyReport(targetStartDate, targetEndDate, unitId);
             
