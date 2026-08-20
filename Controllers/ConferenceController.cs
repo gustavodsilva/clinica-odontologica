@@ -21,11 +21,17 @@ public class ConferenceController : Controller
         _pdfReportService = pdfReportService;
     }
 
+    // Helper para obter a data atual no fuso horário brasileiro (UTC-3)
+    private DateTime GetBrazilianToday()
+    {
+        return DateTime.UtcNow.AddHours(-3).Date;
+    }
+
     // GET: Conference
     public async Task<IActionResult> Index(DateTime? startDate = null, DateTime? endDate = null, int? unitId = null, PaymentStatus? status = null, string view = "consolidated")
     {
         // Se não informou data inicial, usa hoje
-        var targetStartDate = startDate ?? DateTime.UtcNow.Date;
+        var targetStartDate = startDate ?? GetBrazilianToday();
         var targetEndDate = endDate ?? targetStartDate;
 
         // Converter datas do frontend para UTC
@@ -168,7 +174,7 @@ public class ConferenceController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ConfirmConsolidated(int paymentMethodId, DateTime? startDate = null, DateTime? endDate = null, int? unitId = null, PaymentStatus? status = null)
     {
-        var targetStartDate = startDate ?? DateTime.UtcNow.Date;
+        var targetStartDate = startDate ?? GetBrazilianToday();
         var targetEndDate = endDate ?? targetStartDate;
 
         // Converter datas do frontend para UTC
@@ -226,7 +232,7 @@ public class ConferenceController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UnconfirmConsolidated(int paymentMethodId, DateTime? startDate = null, DateTime? endDate = null, int? unitId = null, PaymentStatus? status = null)
     {
-        var targetStartDate = startDate ?? DateTime.UtcNow.Date;
+        var targetStartDate = startDate ?? GetBrazilianToday();
         var targetEndDate = endDate ?? targetStartDate;
 
         // Converter datas do frontend para UTC
@@ -284,7 +290,7 @@ public class ConferenceController : Controller
     {
         try
         {
-            var targetStartDate = startDate ?? DateTime.UtcNow.Date;
+            var targetStartDate = startDate ?? GetBrazilianToday();
             var targetEndDate = endDate ?? targetStartDate;
 
             // Converter datas do frontend para UTC

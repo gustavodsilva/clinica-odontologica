@@ -19,11 +19,17 @@ public class HomeController : Controller
         _currentUserService = currentUserService;
     }
 
+    // Helper para obter a data atual no fuso horário brasileiro (UTC-3)
+    private DateTime GetBrazilianToday()
+    {
+        return DateTime.UtcNow.AddHours(-3).Date;
+    }
+
     public async Task<IActionResult> Index()
     {
         if (User.Identity?.IsAuthenticated == true)
         {
-            var today = DateTime.UtcNow.Date;
+            var today = GetBrazilianToday();
             var isAdmin = _currentUserService.IsAdmin();
             var currentUnitId = _currentUserService.GetCurrentUnitId();
 
