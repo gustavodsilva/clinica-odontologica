@@ -649,7 +649,9 @@ $.validator.addMethod( "dateFA", function( value, element ) {
  * @result false
  *
  * @example <input name="pippo" class="{dateITA:true}" />
- * @desc Declares an optional input element whose value must be a valid date.
+ * @desc Dec
+ * 
+ * es an optional input element whose value must be a valid date.
  *
  * @name $.validator.methods.dateITA
  * @type Boolean
