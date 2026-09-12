@@ -39,6 +39,19 @@ public class FeeRulesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(FeeRule feeRule)
     {
+        // Validar número de parcelas
+        if (feeRule.Installments.HasValue)
+        {
+            if (feeRule.Installments.Value < 1)
+            {
+                ModelState.AddModelError("Installments", "Número de parcelas deve ser pelo menos 1.");
+            }
+            if (feeRule.Installments.Value > 20)
+            {
+                ModelState.AddModelError("Installments", "Número máximo de parcelas permitido é 20.");
+            }
+        }
+
         if (ModelState.IsValid)
         {
             _context.Add(feeRule);
@@ -77,6 +90,19 @@ public class FeeRulesController : Controller
         if (id != feeRule.Id)
         {
             return NotFound();
+        }
+
+        // Validar número de parcelas
+        if (feeRule.Installments.HasValue)
+        {
+            if (feeRule.Installments.Value < 1)
+            {
+                ModelState.AddModelError("Installments", "Número de parcelas deve ser pelo menos 1.");
+            }
+            if (feeRule.Installments.Value > 20)
+            {
+                ModelState.AddModelError("Installments", "Número máximo de parcelas permitido é 20.");
+            }
         }
 
         if (ModelState.IsValid)

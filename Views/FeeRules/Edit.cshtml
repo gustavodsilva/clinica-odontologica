@@ -37,14 +37,15 @@
             
             <div class="form-group mb-3" id="installmentsField" style="display: @(Model.Installments.HasValue ? "block" : "none");">
                 <label for="installments" class="control-label">Número de Parcelas</label>
-                <input type="number" id="installments" name="installments" class="form-control" min="1" value="@(Model.Installments?.ToString() ?? "")" />
+                <input type="number" id="installments" name="installments" class="form-control" min="1" max="20" value="@(Model.Installments?.ToString() ?? "")" />
                 <small class="text-muted">Deixe em branco para taxa única (sem parcelamento)</small>
             </div>
             
             <div class="form-group mb-3">
                 <label asp-for="FeePercentage" class="control-label">Taxa (%)</label>
-                <input asp-for="FeePercentage" class="form-control" type="number" step="0.01" min="0" required />
+                <input asp-for="FeePercentage" class="form-control" type="text" step="0.01" min="0" required placeholder="Ex: 1,53" />
                 <span asp-validation-for="FeePercentage" class="text-danger"></span>
+                <small class="text-muted">Digite a taxa em porcentagem (ex: 1,53 para 1,53%)</small>
             </div>
             
             <div class="form-group mb-3">
