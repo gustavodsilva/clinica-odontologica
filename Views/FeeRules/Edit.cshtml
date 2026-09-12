@@ -42,9 +42,9 @@
             </div>
             
             <div class="form-group mb-3">
-                <label asp-for="FeePercentage" class="control-label">Taxa (%)</label>
-                <input asp-for="FeePercentage" class="form-control" type="text" step="0.01" min="0" required placeholder="Ex: 1,53" />
-                <span asp-validation-for="FeePercentage" class="text-danger"></span>
+                <label for="feePercentageString" class="control-label">Taxa (%)</label>
+                <input id="feePercentageString" name="feePercentageString" class="form-control" type="text" placeholder="Ex: 1,53" required value="@Model.FeePercentage.ToString("F2", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"))" />
+                <span class="text-danger" id="feePercentageError"></span>
                 <small class="text-muted">Digite a taxa em porcentagem (ex: 1,53 para 1,53%)</small>
             </div>
             

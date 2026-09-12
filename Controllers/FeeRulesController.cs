@@ -3,6 +3,7 @@ using ClinicaOdontologica.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace ClinicaOdontologica.Controllers;
 
@@ -14,6 +15,21 @@ public class FeeRulesController : Controller
     public FeeRulesController(ApplicationDbContext context)
     {
         _context = context;
+    }
+
+    // Helper para converter string de taxa para decimal usando cultura pt-BR
+    private decimal ParseFeePercentage(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return 0;
+
+        // Substituir ponto por vírgula para garantir formato brasileiro
+        value = value.Replace('.', ',');
+
+        if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.GetCultureInfo("pt-BR"), out decimal result))
+            return result;
+
+        return 0;
     }
 
     // GET: FeeRules
@@ -37,8 +53,14 @@ public class FeeRulesController : Controller
     // POST: FeeRules/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(FeeRule feeRule)
+    public async Task<IActionResult> Create(FeeRule feeRule, string feePercentageString)
     {
+        // Converter string de taxa para decimal
+        if (!string.IsNullOrWhiteSpace(feePercentageString))
+        {
+            feeRule.FeePercentage = ParseFeePercentage(feePercentageString);
+        }
+
         // Validar número de parcelas
         if (feeRule.Installments.HasValue)
         {
@@ -50,6 +72,12 @@ public class FeeRulesController : Controller
             {
                 ModelState.AddModelError("Installments", "Número máximo de parcelas permitido é 20.");
             }
+        }
+
+        // Validar taxa manualmente
+        if (feeRule.FeePercentage < 0 || feeRule.FeePercentage > 100)
+        {
+            ModelState.AddModelError("FeePercentage", "A taxa deve estar entre 0 e 100.");
         }
 
         if (ModelState.IsValid)
@@ -85,11 +113,17 @@ public class FeeRulesController : Controller
     // POST: FeeRules/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, FeeRule feeRule)
+    public async Task<IActionResult> Edit(int id, FeeRule feeRule, string feePercentageString)
     {
         if (id != feeRule.Id)
         {
             return NotFound();
+        }
+
+        // Converter string de taxa para decimal
+        if (!string.IsNullOrWhiteSpace(feePercentageString))
+        {
+            feeRule.FeePercentage = ParseFeePercentage(feePercentageString);
         }
 
         // Validar número de parcelas
@@ -103,6 +137,12 @@ public class FeeRulesController : Controller
             {
                 ModelState.AddModelError("Installments", "Número máximo de parcelas permitido é 20.");
             }
+        }
+
+        // Validar taxa manualmente
+        if (feeRule.FeePercentage < 0 || feeRule.FeePercentage > 100)
+        {
+            ModelState.AddModelError("FeePercentage", "A taxa deve estar entre 0 e 100.");
         }
 
         if (ModelState.IsValid)
